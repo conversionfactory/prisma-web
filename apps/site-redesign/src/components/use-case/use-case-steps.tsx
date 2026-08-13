@@ -1,3 +1,4 @@
+import { AgentRobot } from "@/components/brand/agent-robot";
 import { Pattern } from "@/components/brand/pattern";
 import { PrismButtonOutline } from "@/components/brand/prism-button";
 import { Reveal } from "@/components/motion/reveal";
@@ -18,26 +19,6 @@ const STEP_HUES = [
   "border-prism-yellow-200 bg-prism-yellow-50 text-prism-yellow-700",
   "border-prism-red-200 bg-prism-red-50 text-prism-red-700",
 ];
-
-// The robot animation André is supplying (2026-08-13). Reserved beside the
-// headline, inside the card.
-//
-// When the asset lands, drop it in here. If it's the same character as
-// brand/agent-robot.tsx, that component's rule applies — the agent means "your
-// agent", so it appears once per page, and this is the section where the agent
-// is the actor ("your agent reads logs, fixes what broke, and redeploys").
-function RobotSlot() {
-  return (
-    <div
-      aria-hidden
-      className="flex size-32 shrink-0 items-center justify-center rounded-xl border border-dashed border-black/20 bg-white/70 p-3 text-center"
-    >
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-        [Robot animation]
-      </p>
-    </div>
-  );
-}
 
 // "Ship [outcome] in three steps" — the headline and the three steps together
 // in one card. Deliberately plain: the section carries no illustration of its
@@ -71,7 +52,11 @@ export function UseCaseSteps({ steps }: Pick<UseCasePageContent, "steps">) {
               <h2 className="max-w-[24ch] text-balance text-[clamp(1.75rem,2.75vw,2.375rem)] leading-[1.1]">
                 {steps.headline}
               </h2>
-              <RobotSlot />
+              {/* the agent, nodding along beside the headline. This is the
+                  section where the agent is the actor ("your agent reads logs,
+                  fixes what broke, and redeploys"), which is the one place per
+                  page the character is allowed — see agent-robot.tsx */}
+              <AgentRobot variant="nod" className="w-32 shrink-0 md:w-36" />
             </div>
 
             <div className="relative mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
