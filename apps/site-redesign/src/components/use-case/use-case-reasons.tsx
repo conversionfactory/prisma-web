@@ -1,26 +1,31 @@
 import { Reveal } from "@/components/motion/reveal";
 import type { UseCasePageContent } from "./types";
 
-// The numeral scaled to the row rather than set at a type size: the SVG's box
-// is the glyph's box, so `h-full` makes it exactly as tall as the row's content
-// and every row gets a different size, set by how much evidence it carries.
+// The numeral is drawn rather than set at a type size, so it fills the height
+// it's given instead of being tied to a font-size.
 //
-// The viewBox is Inter's own metrics — tabular figures sit on a 0.6em advance
-// with a 0.727em cap height, so two digits hug a 1.2 x 0.727 box (x100 here for
-// round numbers). `meet` means the numeral stops growing rather than
-// overflowing if a row ever gets tall enough for width to become the limit.
+// The viewBox is Inter's own metrics: tabular figures sit on a 0.56em advance
+// with a 0.727em cap height, so two digits occupy 112 x 72.7 at this font size,
+// with the baseline at y=72.7. The 6-unit margin around that box is
+// load-bearing — round digits (0, 3, 8) overshoot the cap height and the
+// baseline by about a percent of the em, and a viewBox that hugged the cap box
+// exactly clipped the tops and bottoms off 01, 03 and 04.
+const PAD = 6;
+const GLYPH_W = 112;
+const BASELINE = 72.7;
+
 function LedgerNumeral({ value }: { value: string }) {
   return (
     <svg
-      viewBox="0 0 120 73"
+      viewBox={`${-PAD} ${-PAD} ${GLYPH_W + PAD * 2} ${BASELINE + PAD * 2}`}
       preserveAspectRatio="xMinYMid meet"
       aria-hidden
       focusable="false"
-      className="absolute inset-0 size-full text-black/20"
+      className="absolute inset-0 size-full text-black/[0.07]"
     >
       <text
         x="0"
-        y="72.7"
+        y={BASELINE}
         fill="currentColor"
         fontSize="100"
         fontWeight="500"
@@ -42,10 +47,10 @@ function LedgerNumeral({ value }: { value: string }) {
 // four-card grid and the three icon columns), and a third grid of boxes
 // flattens the whole second half of the page into one texture.
 //
-// What carries it instead is the numerals, set full-height and in ink at 20%.
-// They were briefly in the brand hues and it was too much colour for a section
-// that is otherwise all type — the size is doing the work, so the colour
-// doesn't have to.
+// What carries it instead is the numerals, set large and in ink at 7%. They
+// were briefly in the brand hues and it was too much colour for a section that
+// is otherwise all type — the size is doing the work, so the colour doesn't
+// have to.
 export function UseCaseReasons({ reasons }: Pick<UseCasePageContent, "reasons">) {
   return (
     <section className="bg-white px-4 py-24 sm:px-8 sm:py-32">
@@ -66,10 +71,12 @@ export function UseCaseReasons({ reasons }: Pick<UseCasePageContent, "reasons">)
                   22px while `ch` resolves against the grid's 16px. Fixed on
                   both keeps the four titles stacked into a scannable edge. */}
               <div className="grid items-stretch gap-x-8 gap-y-4 border-b border-black/[0.09] py-9 md:grid-cols-[11rem_minmax(0,16rem)_minmax(0,1fr)] md:gap-x-12 md:py-12 lg:gap-x-16">
-                {/* the SVG is taken out of flow so it can't drive the row's
-                    height — the evidence column sets that, and the numeral
-                    answers to it */}
-                <div className="relative h-14 md:h-auto">
+                {/* Fixed height, not the row's. Sizing each numeral to its own
+                    row made 03 — the longest claim, five lines of evidence —
+                    visibly larger than the rest, which read as a mistake rather
+                    than as weight. One height for all four, and the rows keep
+                    their natural depth underneath. */}
+                <div className="relative h-14 md:h-[7.5rem]">
                   <LedgerNumeral value={String(i + 1).padStart(2, "0")} />
                 </div>
                 <h3 className="text-balance text-[1.375rem] leading-snug">{title}</h3>
