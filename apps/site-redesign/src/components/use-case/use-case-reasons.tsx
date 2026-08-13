@@ -4,14 +4,20 @@ import type { UseCasePageContent } from "./types";
 // The numeral is drawn rather than set at a type size, so it fills the height
 // it's given instead of being tied to a font-size.
 //
-// The viewBox is Inter's own metrics: tabular figures sit on a 0.56em advance
-// with a 0.727em cap height, so two digits occupy 112 x 72.7 at this font size,
-// with the baseline at y=72.7. The 6-unit margin around that box is
-// load-bearing — round digits (0, 3, 8) overshoot the cap height and the
-// baseline by about a percent of the em, and a viewBox that hugged the cap box
-// exactly clipped the tops and bottoms off 01, 03 and 04.
-const PAD = 6;
-const GLYPH_W = 112;
+// The viewBox has to be the glyph's box, and anything outside it is clipped.
+// These numbers are measured from the rendered text (getComputedTextLength and
+// getBBox at this font size), not taken from a spec sheet — two guesses at
+// Inter's metrics both clipped: 0.56em per digit lost the right edge of the
+// second digit, and a box that hugged the cap height exactly lost the tops and
+// bottoms of the round ones.
+//
+// `textLength` pins the advance rather than trusting it, so a fallback font
+// while Inter loads, or a weight change, can't push the glyph back out of the
+// box. `lengthAdjust="spacing"` moves the digits apart, never distorts them.
+const PAD = 8;
+/** Measured: two tabular digits advance 129.54 at font-size 100. */
+const GLYPH_W = 130;
+/** Measured: Inter's cap height, and so the baseline with the cap top at y=0. */
 const BASELINE = 72.7;
 
 function LedgerNumeral({ value }: { value: string }) {
@@ -29,6 +35,8 @@ function LedgerNumeral({ value }: { value: string }) {
         fill="currentColor"
         fontSize="100"
         fontWeight="500"
+        textLength={GLYPH_W}
+        lengthAdjust="spacing"
         style={{ fontVariantNumeric: "tabular-nums" }}
       >
         {value}
@@ -70,7 +78,10 @@ export function UseCaseReasons({ reasons }: Pick<UseCasePageContent, "reasons">)
                   column is in rem rather than ch because the titles are set at
                   22px while `ch` resolves against the grid's 16px. Fixed on
                   both keeps the four titles stacked into a scannable edge. */}
-              <div className="grid items-stretch gap-x-8 gap-y-4 border-b border-black/[0.09] py-9 md:grid-cols-[11rem_minmax(0,16rem)_minmax(0,1fr)] md:gap-x-12 md:py-12 lg:gap-x-16">
+              {/* 13rem, not 11: the numeral's box is 146 x 88.7 and it scales
+                  to fit, so a column any narrower than ~198px makes width the
+                  limit and the numerals stop reaching their full height. */}
+              <div className="grid items-stretch gap-x-8 gap-y-4 border-b border-black/[0.09] py-9 md:grid-cols-[13rem_minmax(0,16rem)_minmax(0,1fr)] md:gap-x-12 md:py-12 lg:gap-x-16">
                 {/* Fixed height, not the row's. Sizing each numeral to its own
                     row made 03 — the longest claim, five lines of evidence —
                     visibly larger than the rest, which read as a mistake rather
