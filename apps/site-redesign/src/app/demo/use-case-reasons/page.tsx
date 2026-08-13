@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { templateUseCase } from "@/components/use-case/content/template";
 import { VariantBento } from "@/components/use-case/reasons-options/variant-bento";
 import { VariantDispersion } from "@/components/use-case/reasons-options/variant-dispersion";
-import { VariantLedger } from "@/components/use-case/reasons-options/variant-ledger";
 import { VariantStatement } from "@/components/use-case/reasons-options/variant-statement";
 import { VariantStepper } from "@/components/use-case/reasons-options/variant-stepper";
+import { UseCaseReasons } from "@/components/use-case/use-case-reasons";
 
 export const metadata: Metadata = {
   title: "Use case — why teams choose Prisma — design options",
@@ -13,10 +13,10 @@ export const metadata: Metadata = {
 
 const OPTIONS = [
   {
-    label: "Option A — The Ledger",
+    label: "Option A — The Ledger  ·  chosen, and live on the page",
     thesis:
-      "No boxes. Four ruled rows read as a spec sheet: index, claim, evidence. The claim column is fixed, so the four titles stack into an edge you can scan without reading the bodies.",
-    Component: VariantLedger,
+      "No boxes. Four ruled rows read as a spec sheet: index, claim, evidence. The claim column is fixed, so the four titles stack into an edge you can scan without reading the bodies. Since being picked, the numerals were set much larger and took the row's hue — they are what carries the section.",
+    Component: UseCaseReasons,
   },
   {
     label: "Option B — Dispersion",
