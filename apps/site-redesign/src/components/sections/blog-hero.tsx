@@ -1,40 +1,28 @@
 import { GlassGlide } from "@/components/brand/glass-glide";
 import { PrismButton, PrismButtonOutline } from "@/components/brand/prism-button";
 import { Texture } from "@/components/brand/texture";
-import { BLOG_POSTS, TOPIC_LABELS, TOPICS } from "@/data/blog-posts";
 
 // /blog hero — the wrapped prismatic panel, centred, following customers-hero.
-// This page opens on a claim and a roster, not on a form or a product visual,
-// so there is no second column to balance (contact-hero.tsx splits at lg for
-// exactly that reason).
+// This page opens on a claim, not on a form or a product visual, so there is no
+// second column to balance (contact-hero.tsx splits at lg for exactly that
+// reason).
 //
 // COPY IS PLACEHOLDER. No approved copy exists for the blog index yet, so the
-// headline, subhead and band label below are written to the right shape and
-// length for the layout and nothing more — they are sized so the real copy can
-// drop in without the panel reflowing. Everything else on the page (post
-// titles, excerpts, dates, authors) is real, from the production feed.
+// headline and subhead below are written to the right shape and length for the
+// layout and nothing more — they are sized so the real copy can drop in without
+// the panel reflowing. Everything else on the page (post titles, excerpts,
+// dates, authors) is real, from the production feed.
 //
-// The topic band lives INSIDE the panel, sitting on the spectral wash, in the
-// slot the "Built with Prisma" logo band takes on /customers. It does the same
-// job that band does — it answers "what's in here" before a single card is
-// read — and like that band it runs straight off the CTAs with no heading
-// marker, so it reads as the panel's footer rather than as its own section.
-//
-// The chips are deliberately NOT links. Topic filtering is a real feature with
-// real UX questions (does it route, does it paginate, what is the empty state)
-// and none of them are answered yet; a chip that looks like a filter and does
-// nothing is worse than a label. Counts are what make it a roster rather than a
-// dead control — the same reason the customers marquee carries "500K+".
+// The topic chips used to sit inside this panel, in the slot the "Built with
+// Prisma" logo band takes on /customers, as a roster with counts rather than a
+// control. They moved out to blog-filters.tsx and became real filters (André,
+// 2026-08-17). The panel keeps no band of its own: with the filter frame
+// directly below it, a second row of chips in the hero would read as two
+// controls for one grid.
 //
 // Wash values are product-hero's calibration, not the homepage's, for the same
 // reason contact-hero gives: this panel is short, and the homepage's stronger
 // values bloom up behind the headline and cost the subhead its contrast.
-
-const TOPIC_COUNTS = TOPICS.map((id) => ({
-  id,
-  label: TOPIC_LABELS[id] ?? id,
-  count: BLOG_POSTS.filter((post) => post.topics.includes(id)).length,
-})).filter((topic) => topic.count > 0);
 
 export function BlogHero() {
   return (
@@ -82,34 +70,6 @@ export function BlogHero() {
                   Read the docs
                 </PrismButtonOutline>
               </div>
-            </div>
-
-            {/* the topic roster, on the wash */}
-            <div className="mt-20 animate-hero-rise-late motion-reduce:animate-none">
-              <p className="text-center text-sm font-semibold text-foreground/70">
-                What we write about
-              </p>
-              {/* flex-wrap rather than the customers band's explicit grid: those
-                  are twelve fixed-width logo plates that divide evenly at every
-                  breakpoint, these are seven chips of wildly different widths,
-                  which a grid would pad into a ragged table. */}
-              <ul className="mx-auto mt-7 flex max-w-4xl flex-wrap items-center justify-center gap-2.5">
-                {TOPIC_COUNTS.map((topic) => (
-                  <li key={topic.id}>
-                    {/* Squared off, not a pill. prism-button.tsx owns
-                        `rounded-full` for both variants, so a white pill with a
-                        hairline border on this panel is pixel-for-pixel the
-                        secondary CTA sitting directly above it — see the same
-                        ruling in marker.tsx. The band logo tiles use rounded-2xl
-                        at 4.5rem tall; these are half that height, so rounded-xl
-                        keeps the corner radius proportional. */}
-                    <span className="spectrum-border flex h-11 items-center gap-2 rounded-xl border border-neutral-200 bg-white/80 px-5 text-sm font-semibold text-foreground backdrop-blur-sm">
-                      {topic.label}
-                      <span className="text-muted-foreground tabular-nums">{topic.count}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
             </div>
           </div>
         </div>

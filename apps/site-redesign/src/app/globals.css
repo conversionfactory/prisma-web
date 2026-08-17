@@ -739,3 +739,14 @@ h6 {
     animation: none;
   }
 }
+
+/* WebKit draws its own clear affordance inside type="search" — a grey glyph
+   with no styling hooks that sits wherever it likes. The /blog filter field
+   ships its own clear button (blog-filters.tsx), so without this the two stack
+   up side by side. type="search" is still what we want for the mobile
+   keyboard's Search key and for the Escape-to-clear behaviour. */
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}

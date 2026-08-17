@@ -2,18 +2,22 @@ import { Marker } from "@/components/brand/marker";
 import { ArrowRightBold } from "@/components/icons/forma";
 import { Reveal } from "@/components/motion/reveal";
 import { PostArt } from "@/components/sections/post-art";
-import { BLOG_POSTS, TOPIC_LABELS, type BlogPost } from "@/data/blog-posts";
+import { TOPIC_LABELS, type BlogPost } from "@/data/blog-posts";
 import { cn } from "@/lib/utils";
 
 // /blog post grid — the customers-grid.tsx structure carried onto the blog
 // index: one full-width lead card, then three columns.
+//
+// Presentational only. It renders whatever list it is handed, so the same
+// component serves the full feed and a filtered subset; blog-browser.tsx owns
+// the filter state and the section chrome around it.
 //
 // Named blog-index-grid rather than blog-grid because sections/blog-grid.tsx is
 // already taken by the Relume scaffold component, which is still referenced by
 // the /components gallery. Renaming that is a separate cleanup, not this
 // branch's business.
 //
-// Sixteen posts: the newest runs full-width as a lead card and the remaining
+// At sixteen posts the newest runs full-width as a lead card and the remaining
 // fifteen fill exactly five rows of three, so the grid never ends on a widowed
 // card. The lead renders the same fields as every other card, just larger and
 // horizontal — no extra copy is needed to promote a post.
@@ -52,25 +56,37 @@ const DATE_FORMAT = new Intl.DateTimeFormat("en-US", {
 // card sitting directly above it, which takes hue 0.
 const hueFor = (position: number) => position + Math.floor(position / 3) + 1;
 
-export function BlogIndexGrid() {
-  const [lead, ...rest] = BLOG_POSTS;
+export function BlogIndexGrid({
+  posts,
+  showLead = true,
+}: {
+  posts: BlogPost[];
+  /** Promote the first post to a full-width lead card. */
+  showLead?: boolean;
+}) {
+  const lead = showLead ? posts[0] : undefined;
+  const rest = showLead ? posts.slice(1) : posts;
 
   return (
-    <section className="bg-white px-4 py-24 sm:px-8 sm:py-32">
-      <div className="mx-auto max-w-site">
+    <div>
+      {lead && (
         <Reveal>
           <PostCard post={lead} index={0} lead />
         </Reveal>
+      )}
 
-        <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {rest.map((post, i) => (
-            <Reveal key={post.slug} delay={(i % 3) * 0.1} className="h-full">
-              <PostCard post={post} index={hueFor(i)} />
-            </Reveal>
-          ))}
-        </div>
+      <div className={cn("grid gap-5 md:grid-cols-2 lg:grid-cols-3", lead && "mt-5")}>
+        {rest.map((post, i) => (
+          // Keyed on slug, so React reuses the right card when the list is
+          // filtered rather than repainting position 0 with new content — an
+          // index key makes every Reveal think it is the same element and the
+          // whole grid stops animating after the first filter change.
+          <Reveal key={post.slug} delay={(i % 3) * 0.1} className="h-full">
+            <PostCard post={post} index={hueFor(i)} />
+          </Reveal>
+        ))}
       </div>
-    </section>
+    </div>
   );
 }
 

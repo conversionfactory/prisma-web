@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import { BlogBrowser } from "@/components/sections/blog-browser";
 import { BlogHero } from "@/components/sections/blog-hero";
-import { BlogIndexGrid } from "@/components/sections/blog-index-grid";
 import { CtaBurst } from "@/components/sections/cta-burst";
 import { LogoCloud } from "@/components/sections/logo-cloud";
 
@@ -12,7 +12,9 @@ export const metadata: Metadata = {
 };
 
 // /blog — the index redesign, built to the section order /customers established
-// (customers/page.tsx): hero panel, content grid, proof band, closer.
+// (customers/page.tsx): hero panel, content, proof band, closer. The content
+// slot here is a filter frame plus the grid it drives, which /customers has no
+// equivalent of — its thirteen stories need no filtering.
 //
 // There is no approved copy for this page. Rather than fill it with lorem, the
 // two kinds of text on it are sourced differently and the difference is worth
@@ -21,8 +23,8 @@ export const metadata: Metadata = {
 //   - Post titles, excerpts, dates and authors are REAL, lifted from the
 //     production blog that ships in this monorepo (apps/blog/content/blog).
 //     Line lengths and density are therefore what the live page would be.
-//   - The hero headline, subhead and band label are PLACEHOLDER, written to the
-//     right shape for the layout. See the note in blog-hero.tsx.
+//   - The hero headline and subhead are PLACEHOLDER, written to the right shape
+//     for the layout. See the note in blog-hero.tsx.
 //
 // The closer is CtaBurst carrying the /customers overrides verbatim rather than
 // a fourth invented headline: that copy is approved and already shipping, and
@@ -38,7 +40,7 @@ export default function BlogPage() {
   return (
     <>
       <BlogHero />
-      <BlogIndexGrid />
+      <BlogBrowser />
       <LogoCloud />
       <CtaBurst
         headline="Ready to build with Prisma?"
