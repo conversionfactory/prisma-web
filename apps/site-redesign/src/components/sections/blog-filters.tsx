@@ -1,31 +1,30 @@
 import { Search, X } from "@/components/icons/forma";
 import { cn } from "@/lib/utils";
 
-// The /blog filter frame — search field on the left, topic chips on the right.
+// The /blog filter controls: a search field with the topic chips under it.
 //
-// These chips started life inside the hero panel as a static roster with counts
-// (the slot /customers gives its "Built with Prisma" logo band). They moved down
-// here and became real controls (André, 2026-08-17). Two things follow from that
-// and are worth not undoing:
+// These chips have moved twice. They started inside the hero panel as a static
+// roster with counts (the slot /customers gives its "Built with Prisma" logo
+// band), then came down here and became real controls. This is the third pass
+// (André, 2026-08-17): the card that boxed them is gone, the field is stacked
+// above rather than beside them, and the field itself carries the brand
+// treatment instead of the frame doing it.
 //
-//   - The frame is its own surface, not a strip of the page. A bare row of
-//     controls floating between the hero panel and the card grid belongs to
-//     neither; boxed, it reads as the thing that operates the grid below it.
-//     Card treatment is contact-message-form.tsx's, which is the site's
-//     established "this is an interactive panel" surface.
-//   - Counts stay on the chips, and they are TOTALS — they do not recount as you
-//     type. A number that moves while you search reads as a result count for the
-//     search rather than as the size of the topic, and the actual result count
-//     has its own line below the frame.
+// Losing the box is what let the field get big. Inside a panel it had to stay
+// h-11 and share a row with eight chips, which capped it at ~320px and left it
+// reading as an admin filter. Free of the panel it takes the measure a search
+// field wants, centred, with the spectrum ring lighting on focus — the same
+// prismatic hairline the outline CTA and the logo tiles use, so the one control
+// on the page that invites typing is also the one that reacts to it.
+//
+// Counts stay on the chips, and they are TOTALS — they do not recount as you
+// type. A number that moves while you search reads as a result count for the
+// search rather than as the size of the topic, and the actual result count has
+// its own line below.
 //
 // Chips are squared off rather than pills: prism-button.tsx owns `rounded-full`
 // for both of its variants, so a white pill with a hairline border is
 // pixel-for-pixel the secondary CTA. Same ruling as marker.tsx.
-
-// Matches contact-message-form.tsx's FIELD, which is the site's field
-// calibration — taller and softer than the shadcn default (h-9, rounded-md).
-const FIELD =
-  "rounded-lg border border-black/[0.09] bg-white text-[15px] shadow-[0_1px_2px_rgba(21,21,21,0.04)]";
 
 export type TopicOption = { id: string; label: string; count: number };
 
@@ -51,83 +50,88 @@ export function BlogFilters({
 
   return (
     <div>
-      <div className="rounded-2xl border border-black/[0.06] bg-card p-5 shadow-[0_1px_2px_rgba(21,21,21,0.04),0_16px_40px_-20px_rgba(21,21,21,0.22)] sm:p-6">
-        {/* Stacked below lg. Seven chips plus an All will not share a row with a
-            search field at tablet width without the field collapsing to
-            something unusable. */}
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-6">
-          <div className="relative lg:w-80 lg:shrink-0">
-            <label htmlFor="blog-search" className="sr-only">
-              Search posts
-            </label>
-            <Search
-              className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-              aria-hidden
-            />
-            <input
-              id="blog-search"
-              // `search` rather than `text` for the mobile keyboard's Search
-              // key. The browser-native clear affordance it adds on WebKit is
-              // suppressed in globals.css — this ships its own, so the two
-              // would sit side by side.
-              type="search"
-              value={query}
-              onChange={(e) => onQueryChange(e.target.value)}
-              placeholder="Search posts"
-              className={cn(
-                FIELD,
-                "h-11 w-full pl-10 pr-10 outline-none placeholder:text-muted-foreground",
-                "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
-              )}
-            />
-            {query !== "" && (
-              <button
-                type="button"
-                onClick={() => onQueryChange("")}
-                aria-label="Clear search"
-                className="absolute right-2.5 top-1/2 flex size-6 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-black/[0.05] hover:text-foreground"
-              >
-                <X className="size-3.5" aria-hidden />
-              </button>
-            )}
-          </div>
-
-          {/* The chips scroll rather than wrap at lg and up: wrapping to a
-              second line inside the frame pushes the search field off centre
-              and the panel grows a ragged bottom edge. Below lg they wrap,
-              because a horizontal scroller next to a stacked field hides half
-              the topics with nothing to say they are there. */}
-          <ul className="flex flex-wrap gap-2 lg:flex-nowrap lg:overflow-x-auto lg:pb-1">
-            <li>
-              <Chip
-                active={activeTopic === null}
-                onClick={() => onTopicChange(null)}
-                count={totalCount}
-              >
-                All
-              </Chip>
-            </li>
-            {topics.map((topic) => (
-              <li key={topic.id}>
-                <Chip
-                  active={activeTopic === topic.id}
-                  onClick={() => onTopicChange(activeTopic === topic.id ? null : topic.id)}
-                  count={topic.count}
-                >
-                  {topic.label}
-                </Chip>
-              </li>
-            ))}
-          </ul>
+      {/* The field. `spectrum-border` paints the prismatic hairline on hover,
+          `spectrum-border-focus` keeps it lit while the field has focus — see
+          the pair in globals.css. Both need the ring's radius to match, which
+          it does via border-radius: inherit, so the rounding lives here only. */}
+      <div className="mx-auto max-w-2xl">
+        <div
+          className={cn(
+            "spectrum-border spectrum-border-focus relative rounded-2xl bg-white",
+            "border border-black/[0.09] shadow-[0_1px_2px_rgba(21,21,21,0.04),0_16px_40px_-24px_rgba(21,21,21,0.28)]",
+            "transition-shadow duration-500 hover:shadow-[0_1px_2px_rgba(21,21,21,0.04),0_20px_48px_-24px_rgba(21,21,21,0.34)]",
+          )}
+        >
+          <label htmlFor="blog-search" className="sr-only">
+            Search posts
+          </label>
+          <Search
+            className="pointer-events-none absolute left-5 top-1/2 size-5 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <input
+            id="blog-search"
+            // `search` rather than `text` for the mobile keyboard's Search key
+            // and Escape-to-clear. The browser-native clear affordance it adds
+            // on WebKit is suppressed in globals.css — this ships its own, so
+            // the two would sit side by side.
+            type="search"
+            value={query}
+            onChange={(e) => onQueryChange(e.target.value)}
+            placeholder="Search posts, topics, authors"
+            // No focus ring: the spectrum hairline IS the focus indicator here,
+            // and a default ring on top of it draws two concentric outlines.
+            className="h-14 w-full rounded-2xl bg-transparent pl-14 pr-14 text-base outline-none placeholder:text-muted-foreground"
+          />
+          {query !== "" && (
+            <button
+              type="button"
+              onClick={() => onQueryChange("")}
+              aria-label="Clear search"
+              className="absolute right-3.5 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-black/[0.05] hover:text-foreground"
+            >
+              <X className="size-4" aria-hidden />
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Chips wrap and centre under the field at every width. They used to
+          scroll horizontally at lg to keep a single-row panel tidy; with no
+          panel to keep tidy, wrapping is strictly better — nothing is hidden
+          off-screen and the block stays symmetrical under the field. */}
+      {/* max-w-5xl, not 4xl: the eight chips measure ~950px laid out, so 4xl
+          (896px) drops "Announcements" onto a line of its own and the block
+          reads as a mistake rather than as a wrap. */}
+      <ul className="mx-auto mt-6 flex max-w-5xl flex-wrap items-center justify-center gap-2">
+        <li>
+          <Chip
+            active={activeTopic === null}
+            onClick={() => onTopicChange(null)}
+            count={totalCount}
+          >
+            All
+          </Chip>
+        </li>
+        {topics.map((topic) => (
+          <li key={topic.id}>
+            <Chip
+              active={activeTopic === topic.id}
+              onClick={() => onTopicChange(activeTopic === topic.id ? null : topic.id)}
+              count={topic.count}
+            >
+              {topic.label}
+            </Chip>
+          </li>
+        ))}
+      </ul>
 
       {/* aria-live so the grid changing under a keyboard or screen-reader user
           is announced — filtering rewrites the page below with no other signal.
           The element is always rendered, never conditionally mounted: a live
           region that appears at the same moment its text does is frequently
           missed by screen readers. */}
-      <p className="mt-4 min-h-5 text-sm text-muted-foreground" aria-live="polite">
+      <p className="mt-6 min-h-5 text-center text-sm text-muted-foreground" aria-live="polite">
         {filtering
           ? `${resultCount} of ${totalCount} ${totalCount === 1 ? "post" : "posts"}`
           : null}

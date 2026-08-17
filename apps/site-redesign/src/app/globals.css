@@ -750,3 +750,11 @@ input[type="search"]::-webkit-search-decoration {
   -webkit-appearance: none;
   appearance: none;
 }
+
+/* Light the spectrum ring on keyboard/typing focus as well as hover. A separate
+   modifier rather than adding :focus-within to .spectrum-border itself, which
+   is on buttons and logo tiles all over the site and would start lighting them
+   on click. Pair it with .spectrum-border. */
+.spectrum-border-focus:focus-within::before {
+  opacity: 1;
+}
