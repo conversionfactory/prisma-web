@@ -17,10 +17,10 @@ import { cn } from "@/lib/utils";
 // hairline the outline CTA and the logo tiles use, so the one control on the
 // page that invites typing is also the one that reacts to it.
 //
-// LEFT ALIGNED, not centred. The block was centred while it was a standalone
-// band between two sections; inside the container it shares an axis with the
-// kicker, the headline, the subhead and the grid, and a centred control block
-// under a left-aligned headline reads as two layouts stitched together.
+// CENTRED. It was briefly left aligned, while the whole page sat in /pricing's
+// left-aligned container. That container now wraps the list only, and the list
+// has no headline of its own to share an axis with — so the controls go back to
+// centring under the centred hero above them.
 //
 // Counts stay on the chips, and they are TOTALS — they do not recount as you
 // type. A number that moves while you search reads as a result count for the
@@ -59,7 +59,7 @@ export function BlogFilters({
           `spectrum-border-focus` keeps it lit while the field has focus — see
           the pair in globals.css. Both need the ring's radius to match, which
           it does via border-radius: inherit, so the rounding lives here only. */}
-      <div className="max-w-xl">
+      <div className="mx-auto max-w-2xl">
         <div
           className={cn(
             "spectrum-border spectrum-border-focus relative rounded-2xl bg-white",
@@ -101,13 +101,14 @@ export function BlogFilters({
         </div>
       </div>
 
-      {/* Chips wrap under the field at every width. They used to scroll
-          horizontally at lg to keep a single-row panel tidy; with no panel to
-          keep tidy, wrapping is strictly better — nothing is hidden off-screen.
-          No max width: the container's max-w-site is wider than the eight chips
-          need (~950px laid out), so they stay on one row at desktop and wrap
-          naturally below it. */}
-      <ul className="mt-5 flex flex-wrap items-center gap-2">
+      {/* Chips wrap and centre under the field at every width. They used to
+          scroll horizontally at lg to keep a single-row panel tidy; with no
+          panel to keep tidy, wrapping is strictly better — nothing is hidden
+          off-screen and the block stays symmetrical under the field.
+          max-w-5xl, not 4xl: the eight chips measure ~950px laid out, so 4xl
+          (896px) drops "Announcements" onto a line of its own and the block
+          reads as a mistake rather than as a wrap. */}
+      <ul className="mx-auto mt-6 flex max-w-5xl flex-wrap items-center justify-center gap-2">
         <li>
           <Chip
             active={activeTopic === null}
@@ -135,7 +136,7 @@ export function BlogFilters({
           The element is always rendered, never conditionally mounted: a live
           region that appears at the same moment its text does is frequently
           missed by screen readers. */}
-      <p className="mt-5 min-h-5 text-sm text-muted-foreground" aria-live="polite">
+      <p className="mt-6 min-h-5 text-center text-sm text-muted-foreground" aria-live="polite">
         {filtering
           ? `${resultCount} of ${totalCount} ${totalCount === 1 ? "post" : "posts"}`
           : null}

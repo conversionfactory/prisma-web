@@ -11,15 +11,14 @@ export const metadata: Metadata = {
   alternates: { canonical: "/blog" },
 };
 
-// /blog — the index redesign.
+// /blog — the index redesign, on the section order /customers established
+// (customers/page.tsx): hero panel, content, proof band, closer.
 //
-// It started on the section order /customers established (hero panel, content,
-// proof band, closer) and has since moved onto /pricing's container instead
-// (client, 2026-08-17): one unwrapped full-bleed band holding the title, the
-// search and chip filters, and the post cards, then the proof band and the
-// closer outside it. What that buys is the same thing it bought /pricing —
-// you land on the list rather than on a screenful of introduction — and it
-// stops the page stacking a bordered hero panel on top of a card grid.
+// The content slot is the list section, and that one section carries
+// /pricing's unwrapped container rather than the site's usual wrapped panel
+// (client, 2026-08-17). Everything around it — the hero, the proof band, the
+// closer — keeps the standard treatment. An earlier pass put the whole page in
+// the pricing container; the ask was for the list.
 //
 // There is no approved copy for this page. Rather than fill it with lorem, the
 // two kinds of text on it are sourced differently and the difference is worth
@@ -44,12 +43,11 @@ export const metadata: Metadata = {
 export default function BlogPage() {
   return (
     <>
-      {/* The title band, the filter controls and the post grid share one
-          container, the way /pricing puts its headline and plan cards in one —
-          see the note in blog-hero.tsx. */}
-      <BlogHero>
-        <BlogBrowser />
-      </BlogHero>
+      <BlogHero />
+      {/* The list section carries /pricing's unwrapped container — wash and
+          grain, no frame — with the controls at its top and the cards on it.
+          See the note in blog-browser.tsx. */}
+      <BlogBrowser />
       <LogoCloud />
       <CtaBurst
         headline="Ready to build with Prisma?"
