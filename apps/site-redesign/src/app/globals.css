@@ -235,7 +235,12 @@
   }
 
   /* Logo marquee — trusted-by strip drifting right-to-left; the track holds
-     two copies of the row, so -50% loops seamlessly. */
+     two copies of the row, so -50% loops seamlessly.
+     45s is tuned to the homepage's 21 square tiles. Duration is per-loop, not
+     per-pixel, so a longer list covers more ground in the same time and scrolls
+     proportionally faster — /customers runs 44 wide tiles, roughly 3.5x the
+     track, and inherited 3.5x the speed. Pass `durationSeconds` to LogoCloud to
+     hold px/s steady across differently sized sets. */
   --animate-logo-marquee: logo-marquee 45s linear infinite;
   @keyframes logo-marquee {
     from {
@@ -730,7 +735,12 @@ h6 {
   pointer-events: none;
 }
 
-:hover > .spectrum-underline::after {
+/* Direct parent for the button link variant, where the label span sits inside
+   the button itself. The `.group` form is for cards that wrap a link: there the
+   label is nested a level or two down, so the immediate-child selector would
+   only fire over the text column and not over the card's image. */
+:hover > .spectrum-underline::after,
+.group:hover .spectrum-underline::after {
   opacity: 1;
 }
 
