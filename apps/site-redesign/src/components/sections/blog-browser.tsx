@@ -66,40 +66,41 @@ export function BlogBrowser() {
     setActiveTopic(null);
   }
 
+  // No <section> and no width container of its own: this renders as the
+  // children of BlogHero, inside that section's max-w-site column and on its
+  // wash. Wrapping it again would nest a second content width inside the first.
   return (
-    <section className="bg-white px-4 py-20 sm:px-8 sm:py-24">
-      <div className="mx-auto max-w-site">
-        <BlogFilters
-          query={query}
-          onQueryChange={setQuery}
-          topics={TOPIC_OPTIONS}
-          activeTopic={activeTopic}
-          onTopicChange={setActiveTopic}
-          resultCount={results.length}
-          totalCount={BLOG_POSTS.length}
-        />
+    <div>
+      <BlogFilters
+        query={query}
+        onQueryChange={setQuery}
+        topics={TOPIC_OPTIONS}
+        activeTopic={activeTopic}
+        onTopicChange={setActiveTopic}
+        resultCount={results.length}
+        totalCount={BLOG_POSTS.length}
+      />
 
-        <div className="mt-6">
-          {results.length > 0 ? (
-            // The lead card only exists in the unfiltered view. It is the
-            // newest post promoted to full width, which is an editorial claim
-            // about the feed — inside a filtered set it is just whichever card
-            // happens to be first, and at three or four results a full-width
-            // card followed by a short row reads as a layout bug.
-            <BlogIndexGrid posts={results} showLead={!filtering} />
-          ) : (
-            <div className="rounded-2xl border border-black/[0.06] bg-card px-6 py-20 text-center">
-              <p className="text-xl leading-snug">No posts match that search.</p>
-              <p className="mx-auto mt-3 max-w-[46ch] text-pretty leading-relaxed text-muted-foreground">
-                Try a broader term, or clear the filters to see all {BLOG_POSTS.length} posts.
-              </p>
-              <div className="mt-7 flex justify-center">
-                <PrismButtonOutline onClick={reset}>Clear filters</PrismButtonOutline>
-              </div>
+      <div className="mt-8">
+        {results.length > 0 ? (
+          // The lead card only exists in the unfiltered view. It is the newest
+          // post promoted to full width, which is an editorial claim about the
+          // feed — inside a filtered set it is just whichever card happens to
+          // be first, and at three or four results a full-width card followed
+          // by a short row reads as a layout bug.
+          <BlogIndexGrid posts={results} showLead={!filtering} />
+        ) : (
+          <div className="rounded-2xl border border-black/[0.06] bg-card px-6 py-20 text-center">
+            <p className="text-xl leading-snug">No posts match that search.</p>
+            <p className="mx-auto mt-3 max-w-[46ch] text-pretty leading-relaxed text-muted-foreground">
+              Try a broader term, or clear the filters to see all {BLOG_POSTS.length} posts.
+            </p>
+            <div className="mt-7 flex justify-center">
+              <PrismButtonOutline onClick={reset}>Clear filters</PrismButtonOutline>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
-    </section>
+    </div>
   );
 }

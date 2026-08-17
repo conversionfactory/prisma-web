@@ -11,10 +11,15 @@ export const metadata: Metadata = {
   alternates: { canonical: "/blog" },
 };
 
-// /blog — the index redesign, built to the section order /customers established
-// (customers/page.tsx): hero panel, content, proof band, closer. The content
-// slot here is a filter frame plus the grid it drives, which /customers has no
-// equivalent of — its thirteen stories need no filtering.
+// /blog — the index redesign.
+//
+// It started on the section order /customers established (hero panel, content,
+// proof band, closer) and has since moved onto /pricing's container instead
+// (client, 2026-08-17): one unwrapped full-bleed band holding the title, the
+// search and chip filters, and the post cards, then the proof band and the
+// closer outside it. What that buys is the same thing it bought /pricing —
+// you land on the list rather than on a screenful of introduction — and it
+// stops the page stacking a bordered hero panel on top of a card grid.
 //
 // There is no approved copy for this page. Rather than fill it with lorem, the
 // two kinds of text on it are sourced differently and the difference is worth
@@ -39,8 +44,12 @@ export const metadata: Metadata = {
 export default function BlogPage() {
   return (
     <>
-      <BlogHero />
-      <BlogBrowser />
+      {/* The title band, the filter controls and the post grid share one
+          container, the way /pricing puts its headline and plan cards in one —
+          see the note in blog-hero.tsx. */}
+      <BlogHero>
+        <BlogBrowser />
+      </BlogHero>
       <LogoCloud />
       <CtaBurst
         headline="Ready to build with Prisma?"
