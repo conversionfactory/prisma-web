@@ -14,11 +14,11 @@ export const metadata: Metadata = {
 // /blog — the index redesign, on the section order /customers established
 // (customers/page.tsx): hero panel, content, proof band, closer.
 //
-// The content slot is the list section, and that one section carries
-// /pricing's unwrapped container rather than the site's usual wrapped panel
-// (client, 2026-08-17). Everything around it — the hero, the proof band, the
-// closer — keeps the standard treatment. An earlier pass put the whole page in
-// the pricing container; the ask was for the list.
+// The content slot is the list section, and it is unframed: a plain white
+// section holding the filter controls and the card grid. It went through
+// /pricing's wrapped panel first and the frame came back off (client,
+// 2026-08-18) — the cards carry their own borders, and a second box around
+// sixteen of them was a ~3,800px rectangle nobody sees the shape of.
 //
 // There is no approved copy for this page. Rather than fill it with lorem, the
 // two kinds of text on it are sourced differently and the difference is worth
@@ -44,9 +44,6 @@ export default function BlogPage() {
   return (
     <>
       <BlogHero />
-      {/* The list section carries /pricing's unwrapped container — wash and
-          grain, no frame — with the controls at its top and the cards on it.
-          See the note in blog-browser.tsx. */}
       <BlogBrowser />
       <LogoCloud />
       <CtaBurst
