@@ -105,11 +105,14 @@ function PostCard({
   // still bottom-aligns because the link takes mt-auto, not the paragraph.
   const secondaryTopics = post.topics.slice(1, 3);
 
+  // Internal post links stay in the tab; only genuinely external hrefs open a
+  // new one. (The roster now points at the redesign's own /blog/[slug].)
+  const external = /^https?:\/\//.test(post.href);
+
   return (
     <a
       href={post.href}
-      target="_blank"
-      rel="noopener noreferrer"
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       className={cn(
         // `group` drives nothing but the spectrum underline on "Read the post"
         // — the card itself deliberately has no hover state (André).

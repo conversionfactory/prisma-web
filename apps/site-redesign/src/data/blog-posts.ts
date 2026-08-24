@@ -64,7 +64,10 @@ export const TOPICS = [
 
 const blogPost = (post: Omit<BlogPost, "href">): BlogPost => ({
   ...post,
-  href: `https://www.prisma.io/blog/${post.slug}`,
+  // Internal, to the redesign's own post template at /blog/[slug]. Posts whose
+  // body doesn't live in the redesign yet render there from this roster entry
+  // (cover + excerpt) with a link out to the full article — see the [slug] page.
+  href: `/blog/${post.slug}`,
 });
 
 export const BLOG_POSTS: BlogPost[] = [
