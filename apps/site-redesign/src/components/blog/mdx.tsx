@@ -1,4 +1,4 @@
-import { ChevronRight } from "@/components/icons/forma"
+import { ChevronRight } from "lucide-react"
 
 // MDX components for ported blog posts. The production blog (apps/blog) renders
 // these through Fumadocs; here they're supplied to next-mdx-remote so the same
@@ -11,10 +11,10 @@ export function Accordions({ children }: { children: React.ReactNode }) {
 
 export function Accordion({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <details className="group rounded-xl border border-black/[0.08] bg-card px-5">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 font-semibold text-foreground [&::-webkit-details-marker]:hidden">
+    <details className="group rounded-xl border border-black/[0.08] bg-card px-5 transition-colors open:border-prism-cyan-400/50 open:bg-prism-cyan-50/40">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 font-semibold text-foreground transition-colors group-open:text-prism-cyan-700 [&::-webkit-details-marker]:hidden">
         <span>{title}</span>
-        <ChevronRight className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-90" />
+        <ChevronRight className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-90 group-open:text-prism-cyan-500" />
       </summary>
       <div className="prose prose-neutral max-w-none pb-5 pt-1">{children}</div>
     </details>

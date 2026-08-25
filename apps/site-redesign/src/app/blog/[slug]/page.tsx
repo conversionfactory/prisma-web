@@ -3,16 +3,19 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { MDXRemote } from "next-mdx-remote/rsc"
 import remarkGfm from "remark-gfm"
-import { ChevronRight } from "@/components/icons/forma"
+import rehypeSlug from "rehype-slug"
+import { ChevronRight } from "lucide-react"
 import { blogMdxComponents } from "@/components/blog/mdx"
+import { PostToc } from "@/components/blog/post-toc"
 import { PrismButton } from "@/components/brand/prism-button"
-import { PostArt } from "@/components/sections/post-art"
+import { PostCover } from "@/components/blog/post-cover"
 import { PostShare } from "@/components/sections/post-share"
+import { Texture } from "@/components/brand/texture"
 import { BlogIndexGrid } from "@/components/sections/blog-index-grid"
 import { CtaBurst } from "@/components/sections/cta-burst"
 import { NewsletterBand } from "@/components/sections/newsletter-band"
 import { RelatedResources, type RelatedResource } from "@/components/sections/related-resources"
-import { BLOG_POSTS, TOPIC_LABELS, type BlogPost } from "@/data/blog-posts"
+import { BLOG_POSTS, TOPIC_LABELS } from "@/data/blog-posts"
 import { getContentBySlug, getContentSlugs } from "@/lib/content"
 import { siteConfig } from "@/lib/config"
 
@@ -153,18 +156,6 @@ export default async function BlogPostPage({ params }: Props) {
   const categoryLabel = leadTopic ? (TOPIC_LABELS[leadTopic] ?? leadTopic) : "Article"
   const canonicalUrl = `${siteConfig.url}/blog/${slug}`
 
-  // A BlogPost-shaped object so the redesign's light PostArt plate can stand in
-  // as the featured image when a post ships without a real one.
-  const artPost: BlogPost = {
-    slug,
-    title,
-    excerpt: description,
-    date,
-    authors: [byline],
-    topics,
-    href: `/blog/${slug}`,
-  }
-
   // Newest three from the index feed, excluding this post if it appears there.
   const morePosts = BLOG_POSTS.filter((p) => p.slug !== slug).slice(0, 3)
 
@@ -172,10 +163,36 @@ export default async function BlogPostPage({ params }: Props) {
     <>
       {/* Two-column post hero — title / byline / share on the left, the featured
           cover on the right (the redesign's light plate, matching the cards). */}
-      <header className="bg-white px-4 pt-32 sm:px-8 md:pt-40">
-        <div className="mx-auto grid max-w-site items-center gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
-          <div>
-            <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm text-muted-foreground">
+      <header className="bg-white px-3 pt-3 sm:px-4 sm:pt-4">
+        <div className="relative mx-auto max-w-[96rem] overflow-hidden rounded-[1.5rem] border border-black/[0.06] bg-white">
+          {/* Spectral bottom — the wash + beam fan the other page heroes use
+              (product-hero / blog-hero), so a post opens on the same wrapped
+              prism panel. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-[30rem] overflow-hidden"
+          >
+            <div
+              className="absolute -bottom-1/3 left-1/2 h-[120%] w-[160%] -translate-x-1/2"
+              style={{
+                background: [
+                  "radial-gradient(52% 40% at 30% 100%, color-mix(in srgb, var(--color-prism-cyan-400) 34%, transparent), transparent 68%)",
+                  "radial-gradient(44% 36% at 52% 100%, color-mix(in srgb, var(--color-prism-yellow-300) 26%, transparent), transparent 66%)",
+                  "radial-gradient(42% 30% at 74% 100%, color-mix(in srgb, var(--color-prism-red-400) 28%, transparent), transparent 68%)",
+                ].join(","),
+              }}
+            />
+            <div className="absolute bottom-[-24rem] left-[10%] h-[60rem] w-36 origin-bottom rotate-[-28deg] bg-prism-cyan-300/50 blur-[64px]" />
+            <div className="absolute bottom-[-26rem] left-1/2 h-[62rem] w-44 origin-bottom -translate-x-1/2 rotate-[5deg] bg-prism-yellow-200/60 blur-[72px]" />
+            <div className="absolute bottom-[-28rem] right-[8%] h-[60rem] w-36 origin-bottom rotate-[28deg] bg-prism-red-300/50 blur-[64px]" />
+            <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-t from-transparent via-white/60 to-white" />
+          </div>
+          <Texture opacity={0.06} blend="multiply" />
+
+          <div className="relative px-4 sm:px-8">
+            <div className="mx-auto grid max-w-site items-center gap-10 pb-16 pt-32 md:pb-20 md:pt-40 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
+              <div>
+                <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <Link href="/blog" className="transition-colors hover:text-foreground">
                 Blog
               </Link>
@@ -215,26 +232,43 @@ export default async function BlogPostPage({ params }: Props) {
               // eslint-disable-next-line @next/next/no-img-element
               <img src={image} alt={imageAlt ?? title} className="aspect-[4/3] w-full object-cover" />
             ) : (
-              <PostArt post={artPost} index={0} size="lead" className="aspect-[4/3] w-full" />
+              <PostCover title={title} topic={categoryLabel} className="aspect-[4/3] w-full" />
             )}
           </figure>
+            </div>
+          </div>
         </div>
       </header>
 
       <article className="bg-white px-4 pb-8 pt-16 sm:px-8">
-        {/* Body + related resources, in the prose measure */}
-        <div className="mx-auto max-w-[46rem]">
-          <p className="text-pretty text-lg leading-relaxed text-muted-foreground">{description}</p>
+        {/* Three columns so the body stays centred while a sticky table of
+            contents rides the left gutter (xl+ only, where the gutter is wide
+            enough). Below xl it collapses to the single centred prose column. */}
+        <div className="mx-auto grid max-w-site grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,46rem)_minmax(0,1fr)]">
+          <aside className="hidden xl:block">
+            {content ? (
+              <div className="sticky top-28 w-52 pr-6">
+                <PostToc />
+              </div>
+            ) : null}
+          </aside>
 
-          {content ? (
-            <div className="prose prose-neutral mt-8 max-w-none prose-headings:scroll-mt-28 prose-pre:rounded-xl prose-pre:border prose-pre:border-black/[0.08] prose-img:rounded-xl prose-img:border prose-img:border-black/[0.06]">
-              <MDXRemote
-                source={content}
-                options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
-                components={blogMdxComponents(`https://www.prisma.io/blog/${slug}`)}
-              />
-            </div>
-          ) : externalUrl ? (
+          {/* Body + related resources, in the prose measure */}
+          <div className="mx-auto w-full max-w-[46rem]">
+            <p className="text-pretty text-lg leading-relaxed text-muted-foreground">{description}</p>
+
+            {content ? (
+              <div
+                id="post-content"
+                className="blog-prose prose prose-neutral mt-8 max-w-none prose-headings:scroll-mt-28 prose-pre:rounded-xl prose-pre:border prose-pre:border-black/[0.08] prose-img:rounded-xl prose-img:border prose-img:border-black/[0.06]"
+              >
+                <MDXRemote
+                  source={content}
+                  options={{ mdxOptions: { remarkPlugins: [remarkGfm], rehypePlugins: [rehypeSlug] } }}
+                  components={blogMdxComponents(`https://www.prisma.io/blog/${slug}`)}
+                />
+              </div>
+            ) : externalUrl ? (
             // Roster post: the body lives on the production blog. Keep the reader
             // on the redesign's template, then hand off to the full article.
             <div className="mt-8 rounded-2xl border border-black/[0.06] bg-card p-8 text-center sm:p-10">
@@ -247,7 +281,10 @@ export default async function BlogPostPage({ params }: Props) {
             </div>
           ) : null}
 
-          <RelatedResources resources={relatedResources} />
+            <RelatedResources resources={relatedResources} />
+          </div>
+
+          <div className="hidden xl:block" aria-hidden />
         </div>
       </article>
 
@@ -270,7 +307,7 @@ export default async function BlogPostPage({ params }: Props) {
 
       {/* More from the Prisma blog */}
       {morePosts.length > 0 && (
-        <section className="bg-white px-4 pb-24 sm:px-8">
+        <section className="bg-white px-4 pb-24 pt-12 sm:px-8 sm:pt-16">
           <div className="mx-auto max-w-site">
             <h2 className="text-center text-[clamp(1.75rem,2.6vw,2.5rem)] leading-tight">
               More from the Prisma blog

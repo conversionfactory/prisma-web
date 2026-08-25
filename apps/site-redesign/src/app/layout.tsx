@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { Agentation } from "agentation"
-import { Inter, Sora } from "next/font/google"
+import { Inter, Sora, IBM_Plex_Mono } from "next/font/google"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -15,6 +15,14 @@ const sora = Sora({
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+})
+
+// Slab monospace for blog code blocks — scoped to .blog-prose in globals.css so
+// the rest of the site's `font-mono` usage is unaffected.
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-plex-mono",
 })
 
 export const metadata: Metadata = {
@@ -59,7 +67,7 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${sora.variable} ${inter.variable}`}
+      className={`${sora.variable} ${inter.variable} ${plexMono.variable}`}
     >
       <body className="antialiased">
         <ThemeProvider>
