@@ -43,6 +43,7 @@ export function ProductHero({
   name,
   accent,
   hero,
+  visual,
   placeholderLabel = "[Product abstraction]",
   benefitsPlacement = "below-cta",
 }: Pick<ProductPageContent, "name" | "hero"> & {
@@ -52,6 +53,13 @@ export function ProductHero({
    * claim a product identity in the kicker dot.
    */
   accent: ProductAccentName | `bg-${string}`;
+  /**
+   * A ready-made visual for the right column, rendered ahead of the tour /
+   * illustration / placeholder fallbacks. Use-case pages carry no product
+   * tour, so they pass an existing site abstraction here (e.g. the Console
+   * illustration) rather than reserving a labelled slot.
+   */
+  visual?: React.ReactNode;
   /** What the reserved illustration slot is waiting for, when there isn't one yet. */
   placeholderLabel?: string;
   /**
@@ -136,9 +144,21 @@ export function ProductHero({
               <h1 className="isolate mt-4 max-w-[min(16ch,100%)] text-balance text-[clamp(2.5rem,4vw,3.5rem)] leading-[1.06]">
                 <Headline headline={hero.headline} emphasis={hero.headlineEmphasis} />
               </h1>
-              <p className="mt-6 max-w-[46ch] text-pretty text-lg leading-relaxed text-muted-foreground">
-                {hero.subheadline}
-              </p>
+              {/* One paragraph on product pages; use-case copy leads with two,
+                  so an array renders a stacked pair at the same measure. */}
+              {(Array.isArray(hero.subheadline) ? hero.subheadline : [hero.subheadline]).map(
+                (para, i) => (
+                  <p
+                    key={i}
+                    className={cn(
+                      "max-w-[46ch] text-pretty text-lg leading-relaxed text-muted-foreground",
+                      i === 0 ? "mt-6" : "mt-4",
+                    )}
+                  >
+                    {para}
+                  </p>
+                ),
+              )}
               {/* Benefits support the CTA rather than delaying it — on product
                   pages they sit below it, so they carry their original weight
                   without competing. It was the position that pushed the CTA
@@ -172,7 +192,11 @@ export function ProductHero({
                     intermediate state while editing content, and it is truthy —
                     it would render a tour whose `% stops.length` is NaN, giving
                     an empty card with no tabs instead of falling through here */}
-                {hero.tour?.length ? (
+                {visual ? (
+                  <div className="max-md:aspect-[4/3] md:flex md:h-full md:items-center">
+                    {visual}
+                  </div>
+                ) : hero.tour?.length ? (
                   <ProductTour stops={hero.tour} />
                 ) : Illustration ? (
                   <div className="max-md:aspect-[4/3] md:h-full">
