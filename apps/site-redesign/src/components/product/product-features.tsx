@@ -49,11 +49,19 @@ export function ProductFeatures({
   cta,
   placeholderLabel = "[Feature abstraction]",
   mediaHeight = "h-64",
+  frameIllustration = false,
 }: Pick<ProductPageContent, "features"> & {
   /** Closes the section where the copy carries one — use-case pages do, product pages don't. */
   cta?: { label: string; href: string };
   /** What the reserved illustration slots are waiting for, when there aren't any yet. */
   placeholderLabel?: string;
+  /**
+   * Float each illustration in a rounded, bordered, shadowed surface over the
+   * ray photo, so hero-scale panels (which are otherwise flush) read as one
+   * consistent card per feature instead of some panels hitting the edges. Used
+   * by pages that reuse the full-bleed hero panels here (the AI-agents stack).
+   */
+  frameIllustration?: boolean;
   /**
    * Height of each card's illustration block. The default suits the three-up
    * row the cards were proportioned for (~2:3 portrait). At two-up the cards
@@ -130,6 +138,7 @@ export function ProductFeatures({
                     <div
                       className={cn(
                         "relative flex select-none items-center justify-center overflow-hidden p-5",
+                        frameIllustration && "p-6 sm:p-8",
                         mediaHeight,
                       )}
                     >
@@ -141,7 +150,13 @@ export function ProductFeatures({
                         )}
                       />
                       {Illustration ? (
-                        <div className="relative size-full">
+                        <div
+                          className={cn(
+                            "relative size-full",
+                            frameIllustration &&
+                              "overflow-hidden rounded-xl border border-black/[0.07] shadow-[0_12px_32px_-14px_rgba(21,21,21,0.22)]",
+                          )}
+                        >
                           <Illustration />
                         </div>
                       ) : (

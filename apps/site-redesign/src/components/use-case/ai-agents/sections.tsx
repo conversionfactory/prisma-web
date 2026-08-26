@@ -1,21 +1,24 @@
 import { IconTile } from "@/components/brand/icon-tile";
 import { Pattern } from "@/components/brand/pattern";
-import { ArrowRight, Bot, CheckBold, Code, Console, Database, LayoutGrid, Rocket, Server, X } from "@/components/icons/forma";
+import { Bot, CheckBold, LayoutGrid, Rocket, X } from "@/components/icons/forma";
+import { PRODUCT_ICONS } from "@/components/product/icons";
 import { ProductFeatures } from "@/components/product/product-features";
 import { ProductNarrative } from "@/components/product/product-narrative";
 import type { ProductIllustrationName } from "@/components/product/illustrations";
 import { Reveal } from "@/components/motion/reveal";
 import { cn } from "@/lib/utils";
 import { AgentToolchain } from "./agent-toolchain";
+import { PrismaAbstraction, StitchedAbstraction } from "./compare-abstractions";
 import { DeployLoopTerminal } from "./deploy-loop-terminal";
 import type { AgentUseCaseContent } from "./content";
 
-// The AI & Agents page's own sections. Each is a deliberately different layout
-// archetype so the page reads as designed, not assembled — an illustrated
-// narrative, a numbered ledger, an asymmetric split, the product feature grid,
-// a running terminal, a before→after transformation, a card row. No two adjacent
-// sections share a shape, and icons are never reused across sections (per the
-// site's design guidelines). Where a section is anchored by a visual, it reuses
+// The AI & Agents page's own sections — an illustrated narrative, an icon-card
+// grid, an asymmetric split, the product feature grid, a running terminal, a
+// two-column comparison, a card row. The "When to use" and "What agents
+// can build" sections both use the site's icon-tile card, since the copy for
+// each names an icon per item and asks to be read as one card per point; the
+// layouts between them keep the page from reading as one long card wall. Where a
+// section is anchored by a visual, it reuses
 // the product pages' own abstractions (the feature cards) or builds a first-
 // class one (the toolchain diagram, the deploy-loop terminal). Shared sections
 // (hero, logo strip, testimonials, closer) are composed in ai-agents-page.tsx.
@@ -33,8 +36,9 @@ export function AgentIntro({ intro }: Pick<AgentUseCaseContent, "intro">) {
     <ProductNarrative
       headline={intro.headline}
       paragraphs={[intro.lede, ...intro.body]}
+      centerText
       illustration={
-        <div className="mx-auto w-full max-w-md lg:my-auto">
+        <div className="w-full">
           <AgentToolchain />
         </div>
       }
@@ -42,40 +46,44 @@ export function AgentIntro({ intro }: Pick<AgentUseCaseContent, "intro">) {
   );
 }
 
-// "When to use Prisma for agent-driven apps" — a numbered ledger. The copy's
-// four titles share the anaphora "Use Prisma when your agent needs…"; a ruled
-// index/claim/detail ledger turns that repetition into a scannable edge, and
-// keeps this section type-driven so it doesn't read as another card grid.
+// "When to use Prisma for agent-driven apps" — icon cards. The copy names an
+// icon per item (schema→code, database, deploy→rocket, debug→repeat), so the
+// section respects them: the /postgres "outcomes" tile (ProductProblem) — an
+// icon tile, a heading, a line of copy, a quiet border — in the same four-up row
+// that page uses, so the four "Use Prisma when your agent needs…" points each
+// read as one card.
 export function AgentWhen({ when }: Pick<AgentUseCaseContent, "when">) {
   return (
     <section className="bg-white px-4 py-24 sm:px-8 sm:py-32">
       <div className="mx-auto max-w-site">
-        <Reveal>
-          <h2 className={cn("max-w-[26ch]", HEADING)}>{when.headline}</h2>
-        </Reveal>
-        <Reveal delay={0.05}>
-          <p className="mt-5 max-w-[62ch] text-pretty text-lg leading-relaxed text-muted-foreground">
-            {when.intro}
-          </p>
-        </Reveal>
+        <div className="mx-auto max-w-3xl text-center">
+          <Reveal>
+            <h2 className={cn("mx-auto max-w-[26ch]", HEADING)}>{when.headline}</h2>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <p className="mt-5 text-pretty text-lg leading-relaxed text-muted-foreground">
+              {when.intro}
+            </p>
+          </Reveal>
+        </div>
 
-        <div className="mt-14 border-t border-black/[0.09]">
-          {when.items.map(({ title, body }, i) => (
-            <Reveal key={title} delay={(i % 2) * 0.08}>
-              <div className="grid items-baseline gap-x-8 gap-y-2 border-b border-black/[0.09] py-8 md:grid-cols-[5rem_minmax(0,22rem)_minmax(0,1fr)] md:gap-x-12 md:py-10">
-                <span
-                  aria-hidden
-                  className="select-none font-medium leading-none tabular-nums text-[clamp(2.5rem,4vw,3.5rem)] text-black/[0.12]"
-                >
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="text-balance text-xl leading-snug">{title}</h3>
-                <p className="max-w-[64ch] text-pretty leading-relaxed text-muted-foreground">
-                  {body}
-                </p>
-              </div>
-            </Reveal>
-          ))}
+        <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {when.items.map(({ icon, title, body }, i) => {
+            const Icon = PRODUCT_ICONS[icon];
+            return (
+              <Reveal key={title} delay={i * 0.08} className="h-full">
+                <div className="flex h-full flex-col rounded-2xl border border-black/[0.06] bg-card p-7">
+                  <IconTile>
+                    <Icon className="size-5 text-foreground" aria-hidden />
+                  </IconTile>
+                  <h3 className="mt-5 text-balance text-xl leading-snug">{title}</h3>
+                  <p className="mt-3 grow text-pretty leading-relaxed text-muted-foreground">
+                    {body}
+                  </p>
+                </div>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -91,7 +99,7 @@ export function AgentFit({ fit }: Pick<AgentUseCaseContent, "fit">) {
     <section className="bg-white px-4 py-24 sm:px-8 sm:py-32">
       <div className="mx-auto max-w-site">
         <Reveal>
-          <h2 className={cn("max-w-[26ch]", HEADING)}>{fit.headline}</h2>
+          <h2 className={cn("mx-auto max-w-[26ch] text-center", HEADING)}>{fit.headline}</h2>
         </Reveal>
 
         <div className="mt-12 grid gap-5 md:grid-cols-[1.15fr_0.85fr]">
@@ -145,8 +153,12 @@ export function AgentStack({ stack }: Pick<AgentUseCaseContent, "stack">) {
           illustration: STACK_ILLUSTRATIONS[i],
         })),
       }}
-      // four cards run two-up, where the default block leaves them squat
-      mediaHeight="h-[22rem]"
+      // four cards run two-up, where the default block leaves them squat; the
+      // hero panels need the extra height so their content isn't clipped
+      mediaHeight="h-[26rem]"
+      // these are the full-bleed hero panels; float them so they read as one
+      // card each instead of hitting the edges (André, 2026-08-26)
+      frameIllustration
     />
   );
 }
@@ -159,112 +171,85 @@ export function AgentStack({ stack }: Pick<AgentUseCaseContent, "stack">) {
 export function AgentDeploy({ deploy }: Pick<AgentUseCaseContent, "deploy">) {
   return (
     <section className="bg-white px-4 py-24 sm:px-8 sm:py-32">
-      <div className="mx-auto max-w-site">
-        <Reveal>
-          <h2 className={cn("max-w-[26ch]", HEADING)}>{deploy.headline}</h2>
-        </Reveal>
-        <Reveal delay={0.05}>
-          <p className="mt-5 max-w-[64ch] text-pretty text-lg leading-relaxed text-muted-foreground">
-            {deploy.intro}
-          </p>
-        </Reveal>
+      {/* headline sits with its copy on the left; the loop runs on the right in
+          a 1:1 frame, matching the intro's square visual */}
+      <div className="mx-auto grid max-w-site items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div className="flex flex-col">
+          <Reveal>
+            <h2 className={cn("max-w-[20ch]", HEADING)}>{deploy.headline}</h2>
+          </Reveal>
+          <div className="mt-5 flex flex-col gap-5">
+            <Reveal delay={0.05}>
+              <p className="max-w-[54ch] text-pretty text-lg leading-relaxed text-muted-foreground">
+                {deploy.intro}
+              </p>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <p className="max-w-[54ch] text-pretty leading-relaxed text-muted-foreground">
+                {deploy.body}
+              </p>
+            </Reveal>
+          </div>
+        </div>
 
-        <Reveal delay={0.1}>
-          <div className="relative mt-12 overflow-hidden rounded-2xl border border-black/[0.06] bg-card p-6 shadow-[0_1px_2px_rgba(21,21,21,0.04),0_24px_48px_-20px_rgba(21,21,21,0.14)] sm:p-10">
+        <Reveal delay={0.12} className="lg:min-w-0">
+          <div className="relative flex aspect-square w-full overflow-hidden rounded-2xl border border-black/[0.06] bg-card p-5 shadow-[0_1px_2px_rgba(21,21,21,0.04),0_24px_48px_-20px_rgba(21,21,21,0.14)] sm:p-6">
             {/* spectrum bloom low in the card, the deploy glow */}
             <div
               aria-hidden
               className="pointer-events-none absolute -bottom-24 left-1/2 h-56 w-[42rem] max-w-full -translate-x-1/2 rounded-full opacity-20 blur-[80px]"
               style={{ backgroundImage: SPECTRUM }}
             />
-            <div className="relative mx-auto max-w-2xl">
+            {/* terminal fills the square so the loop reads as the visual, not a
+                small card floating in it */}
+            <div className="relative flex h-full w-full">
               <DeployLoopTerminal label={deploy.animationLabel} />
             </div>
           </div>
-        </Reveal>
-
-        <Reveal delay={0.15}>
-          <p className="mt-10 max-w-[70ch] text-pretty text-lg leading-relaxed text-muted-foreground">
-            {deploy.body}
-          </p>
         </Reveal>
       </div>
     </section>
   );
 }
 
-// "How Prisma compares to stitched-together stacks" — a single left→right
-// transformation, so it reads differently from the two-card Fit section above.
-// One panel: on the left the five separate tools scattered and disconnected; a
-// gradient seam with an arrow through the middle; on the right they collapse
-// into one connected layer. The seam is the whole point — the same pieces,
-// stitched vs unified.
-const STITCHED_ICONS = [Database, Code, Server, Console, Rocket];
+// "How Prisma compares to stitched-together stacks" — two columns, each an
+// abstraction over its paragraph: the five separate tools on the left, the one
+// connected Prisma layer on the right (see compare-abstractions.tsx). The
+// headline carries the comparison; the copy stays verbatim, one paragraph a
+// side, nothing labelled or invented.
 export function AgentCompare({ compare }: Pick<AgentUseCaseContent, "compare">) {
   return (
     <section className="bg-white px-4 py-24 sm:px-8 sm:py-32">
       <div className="mx-auto max-w-site">
         <Reveal>
-          <h2 className={cn("max-w-[24ch]", HEADING)}>{compare.headline}</h2>
+          <h2 className={cn("mx-auto max-w-[24ch] text-center", HEADING)}>{compare.headline}</h2>
         </Reveal>
 
-        <Reveal delay={0.1}>
-          <div className="relative mt-12 grid overflow-hidden rounded-[1.5rem] border border-black/[0.08] bg-card lg:grid-cols-[1fr_auto_1fr]">
-            {/* before — separate tools, scattered and muted */}
-            <div className="flex flex-col gap-8 bg-muted/30 p-8 sm:p-10">
-              <div className="flex flex-wrap gap-2.5">
-                {STITCHED_ICONS.map((Icon, i) => (
-                  <span
-                    key={i}
-                    aria-hidden
-                    className={cn(
-                      "flex size-11 items-center justify-center rounded-xl border border-dashed border-black/15 bg-white/70",
-                      i % 2 === 0 ? "translate-y-0" : "translate-y-2",
-                    )}
-                  >
-                    <Icon className="size-5 text-foreground/40" />
-                  </span>
-                ))}
+        {/* both abstractions are the same fixed height so their panels align
+            top and bottom; the paragraphs sit beneath, lengths free to differ */}
+        <div className="mt-14 grid gap-6 lg:grid-cols-2 lg:gap-8">
+          <Reveal>
+            <div>
+              <div className="h-[18rem]">
+                <StitchedAbstraction />
               </div>
-              <div className="flex gap-3">
-                <X className="mt-1 size-5 shrink-0 text-foreground/35" strokeWidth={3} aria-hidden />
-                <p className="text-pretty leading-relaxed text-muted-foreground">{compare.before}</p>
-              </div>
+              <p className="mt-6 max-w-[52ch] text-pretty leading-relaxed text-muted-foreground">
+                {compare.before}
+              </p>
             </div>
+          </Reveal>
 
-            {/* the seam — the transformation, an arrow riding the spectrum */}
-            <div className="relative flex items-center justify-center bg-white max-lg:h-14 max-lg:w-full lg:w-16">
-              <span
-                aria-hidden
-                className="absolute bg-gradient-to-b from-prism-cyan-300 via-prism-yellow-300 to-prism-red-400 max-lg:inset-x-0 max-lg:top-1/2 max-lg:h-px max-lg:bg-gradient-to-r lg:inset-y-0 lg:left-1/2 lg:w-px"
-              />
-              <span className="relative flex size-9 items-center justify-center rounded-full border border-border bg-card shadow-[0_8px_20px_-8px_rgba(21,21,21,0.3)]">
-                <ArrowRight className="size-4 text-foreground/70 max-lg:rotate-90" aria-hidden />
-              </span>
+          <Reveal delay={0.1}>
+            <div>
+              <div className="h-[18rem]">
+                <PrismaAbstraction />
+              </div>
+              <p className="mt-6 max-w-[54ch] text-pretty leading-relaxed text-foreground">
+                {compare.after}
+              </p>
             </div>
-
-            {/* after — one connected layer, spectrum-lit */}
-            <div className="relative flex flex-col gap-8 overflow-hidden p-8 sm:p-10">
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0 opacity-[0.05] grayscale [mask-image:linear-gradient(to_bottom,black,transparent_60%)]"
-              >
-                <Pattern className="h-full w-full" scale={2.5} />
-              </div>
-              <div className="relative flex h-11 items-center gap-1 self-start rounded-xl border border-prism-cyan-200 bg-white px-3 shadow-sm">
-                {STITCHED_ICONS.map((Icon, i) => (
-                  <Icon key={i} className="size-5 text-foreground/70" aria-hidden />
-                ))}
-              </div>
-              <div className="relative flex gap-3">
-                <CheckBold className="mt-1 size-5 shrink-0 text-prism-cyan-500" aria-hidden />
-                <p className="text-pretty font-medium leading-relaxed text-foreground">
-                  {compare.after}
-                </p>
-              </div>
-            </div>
-          </div>
-        </Reveal>
+          </Reveal>
+        </div>
       </div>
     </section>
   );
@@ -280,7 +265,7 @@ export function AgentBuilds({ builds }: Pick<AgentUseCaseContent, "builds">) {
     <section className="bg-white px-4 py-24 sm:px-8 sm:py-32">
       <div className="mx-auto max-w-site">
         <Reveal>
-          <h2 className={cn("max-w-[24ch]", HEADING)}>{builds.headline}</h2>
+          <h2 className={cn("mx-auto max-w-[24ch] text-center", HEADING)}>{builds.headline}</h2>
         </Reveal>
 
         <div className="mt-12 grid gap-5 md:grid-cols-3">

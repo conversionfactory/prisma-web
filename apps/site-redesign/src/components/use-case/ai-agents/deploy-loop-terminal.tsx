@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Bot, Check, XCircle } from "@/components/icons/forma";
+import { Bot, Check, CheckCircle, XCircle } from "@/components/icons/forma";
 import { cn } from "@/lib/utils";
 
 // The build → deploy → debug → redeploy loop, running. Not a still and not a
@@ -21,13 +21,51 @@ type Line =
   | { kind: "agent"; text: string };
 
 const STAGES: { label: string; lines: Line[] }[] = [
-  { label: "build", lines: [{ kind: "cmd", text: "prisma migrate deploy" }, { kind: "ok", text: "3 migrations applied" }] },
-  { label: "deploy", lines: [{ kind: "cmd", text: "prisma deploy" }, { kind: "ok", text: "web · api · worker built" }, { kind: "ok", text: "health check — 200 OK" }] },
-  { label: "debug", lines: [{ kind: "cmd", text: "prisma app logs" }, { kind: "warn", text: "TypeError in /api/checkout" }, { kind: "agent", text: "agent: patch applied" }] },
-  { label: "redeploy", lines: [{ kind: "cmd", text: "prisma deploy" }, { kind: "ok", text: "redeployed to us-west-1" }] },
+  {
+    label: "build",
+    lines: [
+      { kind: "cmd", text: "prisma migrate deploy" },
+      { kind: "ok", text: "3 migrations applied" },
+    ],
+  },
+  {
+    label: "deploy",
+    lines: [
+      { kind: "cmd", text: "prisma deploy" },
+      { kind: "ok", text: "web · api · worker built" },
+      { kind: "ok", text: "health check — 200 OK" },
+    ],
+  },
+  {
+    label: "debug",
+    lines: [
+      { kind: "cmd", text: "prisma app logs" },
+      { kind: "warn", text: "TypeError in /api/checkout" },
+      { kind: "agent", text: "agent: patch applied" },
+    ],
+  },
+  {
+    label: "redeploy",
+    lines: [
+      { kind: "cmd", text: "prisma deploy" },
+      { kind: "ok", text: "redeployed to us-west-1" },
+    ],
+  },
 ];
 
 const STEP_MS = 1700;
+
+const SPECTRUM = "linear-gradient(90deg,#01d7e4,#f3c306 25%,#f37a03 50%,#f43531 74%,#f00e5c)";
+
+// The deploy result summary — every value is a fact the log above already
+// streamed, so nothing new is invented; the panel just states the outcome.
+const RESULT: { label: string; value: string; ok?: boolean }[] = [
+  { label: "url", value: "acme-dashboard.prisma.app" },
+  { label: "services", value: "web · api · worker", ok: true },
+  { label: "migrations", value: "3 applied", ok: true },
+  { label: "health", value: "200 OK", ok: true },
+  { label: "region", value: "us-west-1" },
+];
 
 function LogLine({ line, caret }: { line: Line; caret?: boolean }) {
   return (
@@ -89,7 +127,7 @@ export function DeployLoopTerminal({ label }: { label: string }) {
     <div
       role="img"
       aria-label={label}
-      className="relative overflow-hidden rounded-xl border border-border bg-card shadow-[0_12px_32px_-14px_rgba(21,21,21,0.2)]"
+      className="relative flex h-full w-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-[0_12px_32px_-14px_rgba(21,21,21,0.2)]"
     >
       {/* window chrome */}
       <div className="flex items-center gap-2 border-b border-border/70 px-4 py-2.5">
@@ -139,9 +177,10 @@ export function DeployLoopTerminal({ label }: { label: string }) {
         })}
       </div>
 
-      {/* the log */}
-      <div className="min-h-[10.5rem] px-4 py-3 font-mono text-[0.75rem] leading-none">
-        <div className="flex flex-col gap-2.5">
+      {/* the log — a fixed band, newest anchored to the bottom so accumulating
+          lines scroll under the fold rather than resizing the card */}
+      <div className="h-[11rem] shrink-0 overflow-hidden px-4 py-3 font-mono text-[0.75rem] leading-none">
+        <div className="flex h-full flex-col justify-end gap-2.5">
           <AnimatePresence initial={false}>
             {flat.map(({ line, si, li }) => (
               <LogLine
@@ -151,6 +190,46 @@ export function DeployLoopTerminal({ label }: { label: string }) {
               />
             ))}
           </AnimatePresence>
+        </div>
+      </div>
+
+      {/* the deploy result — a clean summary of what the loop shipped, drawn
+          only from the log's own facts. Fills the rest of the card so the space
+          reads as the deployed outcome rather than an empty terminal. */}
+      <div className="relative m-3 mt-0 flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-border bg-muted/20 p-4">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-20 opacity-25 blur-2xl"
+          style={{ backgroundImage: SPECTRUM }}
+        />
+        <div className="relative flex items-center gap-2">
+          <CheckCircle className="size-4 shrink-0 text-prism-cyan-500" aria-hidden />
+          <span className="text-[0.8125rem] font-semibold text-foreground">Deployed</span>
+          <span className="ml-auto flex items-center gap-1.5 rounded-full bg-prism-cyan-100 px-2 py-0.5 text-[0.5625rem] font-semibold text-prism-cyan-800">
+            <span className="size-1.5 animate-status-pulse rounded-full bg-prism-cyan-400 motion-reduce:animate-none" />
+            live
+          </span>
+        </div>
+
+        <div className="relative mt-2 flex min-h-0 flex-1 flex-col justify-between">
+          {RESULT.map(({ label, value, ok }) => (
+            <div
+              key={label}
+              className="flex items-center gap-2 border-t border-border/50 py-2 font-mono text-[0.6875rem] first:border-t-0"
+            >
+              <span className="text-muted-foreground">{label}</span>
+              <span className="ml-auto flex items-center gap-1.5 text-foreground">
+                {ok ? (
+                  <Check
+                    className="size-3 shrink-0 text-prism-cyan-500"
+                    strokeWidth={3}
+                    aria-hidden
+                  />
+                ) : null}
+                {value}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

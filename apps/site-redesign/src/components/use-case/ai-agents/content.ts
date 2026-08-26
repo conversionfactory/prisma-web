@@ -116,7 +116,8 @@ export const aiAgentsUseCase: AgentUseCaseContent = {
   },
   fit: {
     headline: "Is Prisma the right fit for AI and agents?",
-    suited: "Prisma is best suited for TypeScript applications and agent-driven TypeScript workflows.",
+    suited:
+      "Prisma is best suited for TypeScript applications and agent-driven TypeScript workflows.",
     caveat:
       "Prisma may not be the right fit if your app is primarily outside the TypeScript ecosystem, if you need a fully bundled backend platform with built-in auth, or if you only need a standalone database without the ORM, schema, migration, and deployment workflow around it.",
   },

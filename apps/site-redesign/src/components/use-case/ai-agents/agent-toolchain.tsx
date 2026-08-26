@@ -7,7 +7,8 @@ import { Code, Console, Database, Server } from "@/components/icons/forma";
 // The four pieces the copy names — schema, database, hosting, CLI — sit on a
 // rail wired up to the agent above them, so the picture says the section's
 // point: one connected Prisma toolchain the agent drives, not four separate
-// contexts. Square by design (aspect-square), so it reads as one object.
+// contexts. Square by design (1:1), filling its column so it reads as one large
+// object; the copy beside it is centred to the square (see AgentIntro).
 const NODES = [
   { Icon: Code, label: "Schema" },
   { Icon: Database, label: "Database" },
@@ -44,10 +45,7 @@ export function AgentToolchain() {
 
       {/* Prismo, floating over a soft bloom */}
       <div className="relative flex flex-1 items-center justify-center">
-        <div
-          aria-hidden
-          className="absolute size-[52%] rounded-full bg-white/50 blur-2xl"
-        />
+        <div aria-hidden className="absolute size-[52%] rounded-full bg-white/50 blur-2xl" />
         <AgentRobot variant="look" className="relative w-[46%]" />
       </div>
 
@@ -67,7 +65,10 @@ export function AgentToolchain() {
           {NODES.map(({ Icon, label }) => (
             <div key={label} className="relative flex flex-col items-center gap-2">
               {/* connector stub rising to the rail */}
-              <span aria-hidden className="absolute left-1/2 top-0 h-4 w-px -translate-x-1/2 -translate-y-4 bg-black/15" />
+              <span
+                aria-hidden
+                className="absolute left-1/2 top-0 h-4 w-px -translate-x-1/2 -translate-y-4 bg-black/15"
+              />
               <IconTile className="size-10 sm:size-11">
                 <Icon className="size-4 text-foreground sm:size-[1.125rem]" aria-hidden />
               </IconTile>
