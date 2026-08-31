@@ -2,6 +2,7 @@ import { Marker } from "@/components/brand/marker"
 import { ArrowRightBold } from "@/components/icons/forma"
 import { Reveal } from "@/components/motion/reveal"
 import { StoryArt } from "@/components/sections/story-art"
+import { STORY_DETAIL_SLUGS } from "@/data/customer-stories"
 import { CUSTOMER_STORIES, type CustomerStory } from "@/data/customers"
 import { cn } from "@/lib/utils"
 
@@ -55,9 +56,9 @@ const MAX_CHIPS = 3
 // two-column card is ~690px, far wider than a logo plate wants. Three lands at
 // ~455px, close to the reference's own ~500px.
 //
-// Cards link out to the prisma.io blog posts for now. /customers/[slug] is in
-// the sitemap and the data already carries slugs, so switching the href is a
-// one-line change when those pages exist.
+// Cards link inward to /customers/[slug] where a detail page has been built
+// (STORY_DETAIL_SLUGS), and fall back to the live prisma.io blog post for the
+// rest until their pages land.
 export function CustomersGrid() {
   const [lead, ...rest] = CUSTOMER_STORIES
 
@@ -81,11 +82,14 @@ export function CustomersGrid() {
 }
 
 function StoryCard({ story, lead = false }: { story: CustomerStory; lead?: boolean }) {
+  const internal = STORY_DETAIL_SLUGS.has(story.slug)
+  const href = internal ? `/customers/${story.slug}` : story.href
+
   return (
     <a
-      href={story.href}
-      target="_blank"
-      rel="noopener noreferrer"
+      href={href}
+      target={internal ? undefined : "_blank"}
+      rel={internal ? undefined : "noopener noreferrer"}
       className={cn(
         // `group` drives nothing but the spectrum underline on "Read the story"
         // — the card itself deliberately has no hover state (André).
