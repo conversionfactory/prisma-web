@@ -562,6 +562,19 @@
   }
 }
 
+/* In-page anchor links (e.g. the brand-kit "Browse the assets" CTA → #downloads)
+   glide instead of jumping. Sections carry `scroll-mt-*` for the fixed header.
+   Unlayered so it beats Tailwind's base layer; disabled for reduced motion. */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 /* Brand rule: headings are always the heading face at Medium (the variable
    axis midpoint between Regular and SemiBold — 600 read too heavy) and
    natural letter-spacing — the bold pass from client feedback (2026-07):
@@ -748,4 +761,23 @@ h6 {
   .spectrum-underline::after {
     animation: none;
   }
+}
+
+/* WebKit draws its own clear affordance inside type="search" — a grey glyph
+   with no styling hooks that sits wherever it likes. The /blog filter field
+   ships its own clear button (blog-filters.tsx), so without this the two stack
+   up side by side. type="search" is still what we want for the mobile
+   keyboard's Search key and for the Escape-to-clear behaviour. */
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Light the spectrum ring on keyboard/typing focus as well as hover. A separate
+   modifier rather than adding :focus-within to .spectrum-border itself, which
+   is on buttons and logo tiles all over the site and would start lighting them
+   on click. Pair it with .spectrum-border. */
+.spectrum-border-focus:focus-within::before {
+  opacity: 1;
 }
