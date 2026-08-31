@@ -17,7 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/how-it-works",
     "/integrations",
     "/solutions",
-    "/case-studies",
+    "/customers",
     "/compare",
     "/alternative",
     "/versus",
@@ -41,7 +41,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const contentTypes = [
     { dir: "features", prefix: "features" },
     { dir: "solutions", prefix: "solutions" },
-    { dir: "case-studies", prefix: "case-studies" },
+    // No customers entry: /customers is a single index for now, and its stories
+    // link out to prisma.io/blog. Add it when /customers/[slug] lands.
     { dir: "compare", prefix: "compare" },
     { dir: "alternatives", prefix: "alternative" },
     { dir: "versus", prefix: "versus" },

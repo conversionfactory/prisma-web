@@ -39,10 +39,10 @@ export default function DemoThankYouPage() {
                 Browse features
               </Link>
               <Link
-                href="/case-studies"
+                href="/customers"
                 className="text-sm text-muted-foreground underline-offset-4 hover:underline"
               >
-                Read case studies
+                Read customer stories
               </Link>
             </div>
           </div>

@@ -1,11 +1,12 @@
 import { Reveal } from "@/components/motion/reveal"
+import { cn } from "@/lib/utils"
 
-type Logo = {
+export type Logo = {
   name: string
   /** File in /public/logos. Omit to render a text wordmark fallback. */
   src?: string
-  /** Where the tile links out to. */
-  href: string
+  /** Where the tile links out to. Omit to render an unlinked tile. */
+  href?: string
   /** Visual size correction so every mark reads at the same optical weight:
       "sm" reins in dense/wide marks, "lg" boosts small-drawn icons. */
   fit?: "sm" | "lg"
@@ -13,7 +14,7 @@ type Logo = {
 
 // Logos pulled from the "Prisma ORM" section on prisma.io, in the same order.
 // Next.js and Vercel use icon-only marks so they sit square in the tiles.
-const logos: Logo[] = [
+const ECOSYSTEM_LOGOS: Logo[] = [
   { name: "Cloudflare D1", src: "/logos/cloudflare-d1.svg", href: "https://developers.cloudflare.com/d1/" },
   { name: "Cloudflare", src: "/logos/cloudflare-icon-only.svg", href: "https://www.cloudflare.com", fit: "sm" },
   { name: "Astro", src: "/logos/astro.svg", href: "https://astro.build" },
@@ -43,54 +44,109 @@ const FIT_CLASS = {
   lg: "max-h-12 w-auto max-w-14 object-contain",
 }
 
-function LogoTile({ logo }: { logo: Logo }) {
+function LogoTile({ logo, wide = false }: { logo: Logo; wide?: boolean }) {
+  const tile = cn(
+    "spectrum-border flex h-24 shrink-0 items-center justify-center rounded-2xl border border-neutral-200 bg-white",
+    wide ? "w-44 px-6" : "w-24 p-4",
+  )
+  const mark = logo.src ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={logo.src}
+      alt={logo.name}
+      className={wide ? "max-h-10 w-auto max-w-[8rem] object-contain" : FIT_CLASS[logo.fit ?? "md"]}
+      loading="lazy"
+      draggable={false}
+    />
+  ) : (
+    <span className="select-none text-center text-[0.7rem] font-semibold leading-tight tracking-tight text-foreground">
+      {logo.name}
+    </span>
+  )
+
+  if (!logo.href) {
+    return <div className={tile}>{mark}</div>
+  }
+
   return (
     <a
       href={logo.href}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={logo.name}
-      className="spectrum-border flex size-24 shrink-0 items-center justify-center rounded-2xl border border-neutral-200 bg-white p-4 transition-[transform,border-color] duration-500 ease-out hover:scale-[0.97] hover:border-transparent motion-reduce:hover:scale-100"
-    >
-      {logo.src ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={logo.src}
-          alt={logo.name}
-          className={FIT_CLASS[logo.fit ?? "md"]}
-          loading="lazy"
-          draggable={false}
-        />
-      ) : (
-        <span className="select-none text-center text-[0.7rem] font-semibold leading-tight tracking-tight text-foreground">
-          {logo.name}
-        </span>
+      className={cn(
+        tile,
+        "transition-[transform,border-color] duration-500 ease-out hover:scale-[0.97] hover:border-transparent motion-reduce:hover:scale-100",
       )}
+    >
+      {mark}
     </a>
   )
 }
 
-function Track({ hidden = false }: { hidden?: boolean }) {
+function Track({
+  logos,
+  wide,
+  hidden = false,
+}: {
+  logos: Logo[]
+  wide?: boolean
+  hidden?: boolean
+}) {
   return (
     <div
       className="flex shrink-0 items-center gap-x-5 pr-5"
       aria-hidden={hidden || undefined}
     >
       {logos.map((logo) => (
-        <LogoTile key={logo.name} logo={logo} />
+        <LogoTile key={logo.name} logo={logo} wide={wide} />
       ))}
     </div>
   )
 }
 
-export function LogoCloud() {
+type LogoCloudProps = {
+  /** Defaults to the ecosystem/integration marks used on the homepage. */
+  logos?: Logo[]
+  /** Defaults to the homepage's small uppercase kicker. */
+  heading?: React.ReactNode
+  /**
+   * Landscape tiles for wordmark logos. The square tile is sized for the
+   * homepage's ecosystem set, which is nearly all icon marks; customer logos
+   * are nearly all wordmarks, and squeezing those into a 48px box renders them
+   * unreadably small.
+   */
+  wide?: boolean
+  /**
+   * Seconds for one full loop. The keyframe duration is per-loop, not
+   * per-pixel, so a longer list covers more ground in the same time and drifts
+   * proportionally faster — leave this unset and 44 wide tiles scroll ~3.5x
+   * quicker than the homepage's 21 square ones. Set it to hold px/s steady.
+   */
+  durationSeconds?: number
+  className?: string
+}
+
+// The marquee is shared: the homepage runs it over the ecosystem marks, and
+// /customers runs it over all 44 community projects under its own heading.
+// Parameterised rather than copied because the three customer surfaces on this
+// site already each keep a private list and have drifted apart.
+export function LogoCloud({
+  logos = ECOSYSTEM_LOGOS,
+  heading,
+  wide,
+  durationSeconds,
+  className,
+}: LogoCloudProps = {}) {
   return (
-    <section className="px-6 py-16 lg:px-8 lg:py-24">
+    <section className={cn("px-6 py-16 lg:px-8 lg:py-24", className)}>
       <div className="mx-auto max-w-site">
         <Reveal>
-          <p className="text-center text-sm font-medium uppercase tracking-wider text-muted-foreground">
-            Trusted by leading companies
-          </p>
+          {heading ?? (
+            <p className="text-center text-sm font-medium uppercase tracking-wider text-muted-foreground">
+              Trusted by leading companies
+            </p>
+          )}
         </Reveal>
 
         <Reveal delay={0.1} className="group relative mt-10 overflow-hidden motion-reduce:overflow-x-auto">
@@ -98,9 +154,12 @@ export function LogoCloud() {
           <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background to-transparent sm:w-24" />
           <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background to-transparent sm:w-24" />
 
-          <div className="flex w-max animate-logo-marquee hover:[animation-play-state:paused] motion-reduce:animate-none">
-            <Track />
-            <Track hidden />
+          <div
+            className="flex w-max animate-logo-marquee hover:[animation-play-state:paused] motion-reduce:animate-none"
+            style={durationSeconds ? { animationDuration: `${durationSeconds}s` } : undefined}
+          >
+            <Track logos={logos} wide={wide} />
+            <Track logos={logos} wide={wide} hidden />
           </div>
         </Reveal>
       </div>
