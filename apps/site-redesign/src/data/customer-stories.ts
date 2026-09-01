@@ -57,6 +57,8 @@ export type CustomerStoryDetail = {
     heading: string
     /** Paragraphs before the constraint list. */
     body: string[]
+    /** Optional pull quote shown under the intro, beside the constraints. */
+    quote?: Quote
     points: { icon: ProductIconName; title: string; body: string }[]
     /** Closing line after the constraints. */
     outro?: string
@@ -588,6 +590,12 @@ export const CUSTOMER_STORY_DETAILS: CustomerStoryDetail[] = [
         "Elsevier's peer-review process for scientific publications was manual, outdated, and slow, a logically complex workflow that needed modernizing to stay competitive in healthcare research.",
         "Rebuilding it came with real constraints:",
       ],
+      quote: {
+        text: "The flexibility of moving fast and changing the product based on user feedback fast was crucial.",
+        author: "Serghei Ghidora",
+        role: "Tech Lead",
+        company: "Elsevier",
+      },
       points: [
         {
           icon: "layers",

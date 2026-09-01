@@ -319,6 +319,21 @@ function StoryChallenge({ story }: { story: CustomerStoryDetail }) {
                   <p key={i}>{p}</p>
                 ))}
               </div>
+              {story.challenge.quote && (
+                <figure className="mt-8 border-l-2 border-prism-cyan-400 pl-5">
+                  <blockquote className="text-pretty text-lg font-medium leading-relaxed text-foreground">
+                    &ldquo;{story.challenge.quote.text}&rdquo;
+                  </blockquote>
+                  <figcaption className="mt-3 text-sm text-muted-foreground">
+                    <span className="font-semibold text-foreground">
+                      {story.challenge.quote.author}
+                    </span>
+                    {", "}
+                    {story.challenge.quote.role}
+                    {story.challenge.quote.company && <>, {story.challenge.quote.company}</>}
+                  </figcaption>
+                </figure>
+              )}
             </Reveal>
 
             <div className="flex flex-col gap-4">
