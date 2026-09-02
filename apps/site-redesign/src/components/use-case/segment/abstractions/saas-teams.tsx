@@ -1,16 +1,7 @@
 import { IconTile } from "@/components/brand/icon-tile";
 import { Marker } from "@/components/brand/marker";
-import { Pattern } from "@/components/brand/pattern";
-import {
-  AppWindow,
-  Code,
-  Database,
-  GitBranch,
-  Layers,
-  Rocket,
-  Server,
-  Swap,
-} from "@/components/icons/forma";
+import { ConsoleIllustration } from "@/components/sections/console-illustration";
+import { AppWindow, Database, GitBranch, Layers } from "@/components/icons/forma";
 
 const SPECTRUM = "linear-gradient(90deg,#01d7e4,#f3c306 25%,#f37a03 50%,#f43531 74%,#f00e5c)";
 
@@ -129,52 +120,9 @@ export function SaasHeroVisual() {
   );
 }
 
-// Intro — one Prisma project bringing the pieces the copy names together: the
-// data model, ORM, Postgres, hosting, migrations, and preview environments in
-// one container, with the deploy workflow along the bottom.
-const PIECES = [
-  { Icon: Code, label: "Data model" },
-  { Icon: Layers, label: "ORM" },
-  { Icon: Database, label: "Postgres" },
-  { Icon: Server, label: "Hosting" },
-  { Icon: Swap, label: "Migrations" },
-  { Icon: GitBranch, label: "Previews" },
-];
-
+// Intro — the actual Prisma Console: one project with an app and a database,
+// ready to deploy. Reuses the landing-page illustration so the picture shows
+// the real product, not a placeholder (teammate feedback, 2026-08-26).
 export function SaasIntroVisual() {
-  return (
-    <div className="relative mx-auto flex aspect-square w-full max-w-md flex-col overflow-hidden rounded-[1.25rem] border border-black/[0.06] bg-card shadow-[0_1px_2px_rgba(21,21,21,0.04),0_24px_48px_-24px_rgba(21,21,21,0.14)] lg:my-auto">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.05] grayscale [mask-image:linear-gradient(to_bottom,black,transparent_45%)]"
-      >
-        <Pattern className="h-full w-full" scale={2.5} />
-      </div>
-      <div className="relative flex items-center gap-2 border-b border-border/70 px-5 py-3.5">
-        <span className="size-2 rounded-full bg-border" />
-        <span className="size-2 rounded-full bg-border" />
-        <span className="ml-1.5 font-mono text-xs text-foreground">one Prisma project</span>
-      </div>
-      <div className="relative flex min-h-0 flex-1 flex-col gap-3 p-5">
-        <div className="grid flex-1 grid-cols-2 gap-2.5">
-          {PIECES.map(({ Icon, label }) => (
-            <div
-              key={label}
-              className="flex items-center gap-2.5 rounded-xl border border-black/[0.06] bg-white px-3 shadow-[0_1px_2px_rgba(21,21,21,0.04)]"
-            >
-              <IconTile className="size-8">
-                <Icon className="size-4 text-foreground" aria-hidden />
-              </IconTile>
-              <span className="text-[0.8125rem] font-medium text-foreground">{label}</span>
-            </div>
-          ))}
-        </div>
-        <div className="flex items-center gap-2 rounded-xl border border-border bg-primary px-3.5 py-3 font-mono text-[0.75rem] text-primary-foreground">
-          <Rocket className="size-3.5 shrink-0 text-prism-cyan-400" aria-hidden />
-          <span>deploy workflow</span>
-          <span className="ml-auto text-primary-foreground/60">branch → production</span>
-        </div>
-      </div>
-    </div>
-  );
+  return <ConsoleIllustration />;
 }

@@ -1,16 +1,7 @@
 import { IconTile } from "@/components/brand/icon-tile";
 import { Marker } from "@/components/brand/marker";
-import { Pattern } from "@/components/brand/pattern";
-import {
-  AppWindow,
-  CheckBold,
-  Code,
-  Database,
-  GitBranch,
-  Rocket,
-  Server,
-  Swap,
-} from "@/components/icons/forma";
+import { OrmIllustration } from "@/components/sections/orm-illustration";
+import { AppWindow, CheckBold, Code, Database, GitBranch, Swap } from "@/components/icons/forma";
 
 const PANEL =
   "relative flex h-full w-full flex-col overflow-hidden rounded-[1.25rem] border border-black/[0.06] bg-card shadow-[0_1px_2px_rgba(21,21,21,0.04),0_24px_48px_-24px_rgba(21,21,21,0.14)]";
@@ -91,57 +82,9 @@ export function EngineeringHeroVisual() {
   );
 }
 
-// Intro — one connected workflow flowing from the schema: the shared contract
-// at the top, the parts that stay aligned with it on a spine beneath.
-const DOWNSTREAM = [
-  { Icon: Swap, label: "Queries" },
-  { Icon: GitBranch, label: "Migrations" },
-  { Icon: Server, label: "Environments" },
-  { Icon: Rocket, label: "Deployment" },
-];
-
+// Intro — the ORM illustration: the schema-backed, fully typed client the team
+// shares. Reuses the landing-page illustration so the picture shows the real
+// product, not a placeholder (teammate feedback, 2026-08-26).
 export function EngineeringIntroVisual() {
-  return (
-    <div className="relative mx-auto flex aspect-square w-full max-w-md flex-col overflow-hidden rounded-[1.25rem] border border-black/[0.06] bg-card shadow-[0_1px_2px_rgba(21,21,21,0.04),0_24px_48px_-24px_rgba(21,21,21,0.14)] lg:my-auto">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.05] grayscale [mask-image:linear-gradient(to_bottom,black,transparent_45%)]"
-      >
-        <Pattern className="h-full w-full" scale={2.5} />
-      </div>
-      <div className="relative flex items-center gap-2 border-b border-border/70 px-5 py-3.5">
-        <span className="size-2 rounded-full bg-border" />
-        <span className="size-2 rounded-full bg-border" />
-        <span className="ml-1.5 font-mono text-xs text-foreground">one shared workflow</span>
-      </div>
-      <div className="relative flex min-h-0 flex-1 flex-col justify-center gap-3 px-5 py-5">
-        {/* the schema, promoted — everything downstream stays aligned to it */}
-        <div className="spectrum-border spectrum-border-on relative flex items-center gap-3 rounded-xl border border-transparent bg-white px-3.5 py-3">
-          <IconTile className="size-9">
-            <Code className="size-4 text-foreground" aria-hidden />
-          </IconTile>
-          <div className="flex flex-col">
-            <span className="text-[0.8125rem] font-semibold text-foreground">Prisma schema</span>
-            <span className="text-[0.6875rem] text-muted-foreground">shared contract</span>
-          </div>
-        </div>
-
-        <span aria-hidden className="mx-auto h-4 w-px bg-black/15" />
-
-        <div className="relative grid grid-cols-2 gap-2.5">
-          {DOWNSTREAM.map(({ Icon, label }) => (
-            <div
-              key={label}
-              className="flex items-center gap-2.5 rounded-xl border border-black/[0.06] bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(21,21,21,0.04)]"
-            >
-              <IconTile className="size-8">
-                <Icon className="size-4 text-foreground" aria-hidden />
-              </IconTile>
-              <span className="text-[0.8125rem] font-medium text-foreground">{label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  return <OrmIllustration />;
 }

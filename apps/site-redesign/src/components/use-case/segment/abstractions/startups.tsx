@@ -1,6 +1,5 @@
-import { IconTile } from "@/components/brand/icon-tile";
-import { Pattern } from "@/components/brand/pattern";
-import { Check, Code, Database, Rocket, Server, Swap } from "@/components/icons/forma";
+import { ComputeIllustration } from "@/components/sections/compute-illustration";
+import { Check } from "@/components/icons/forma";
 
 const SPECTRUM = "linear-gradient(90deg,#01d7e4,#f3c306 25%,#f37a03 50%,#f43531 74%,#f00e5c)";
 
@@ -105,47 +104,9 @@ export function StartupsHeroVisual() {
   );
 }
 
-// Intro — one connected stack: the core product pieces the copy names, on a
-// single spine, so they read as one thing rather than separate vendors.
-const PIECES = [
-  { Icon: Code, label: "Data model" },
-  { Icon: Database, label: "Database" },
-  { Icon: Swap, label: "Queries" },
-  { Icon: Server, label: "Migrations" },
-  { Icon: Rocket, label: "Deployment" },
-];
-
+// Intro — the Compute deploy illustration: a founder's app going live from the
+// same connected stack. Reuses the landing-page illustration so the picture
+// shows the real product, not a placeholder (teammate feedback, 2026-08-26).
 export function StartupsIntroVisual() {
-  return (
-    <div className="relative mx-auto flex aspect-square w-full max-w-md flex-col overflow-hidden rounded-[1.25rem] border border-black/[0.06] bg-card shadow-[0_1px_2px_rgba(21,21,21,0.04),0_24px_48px_-24px_rgba(21,21,21,0.14)] lg:my-auto">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.05] grayscale [mask-image:linear-gradient(to_bottom,black,transparent_45%)]"
-      >
-        <Pattern className="h-full w-full" scale={2.5} />
-      </div>
-      <div className="relative flex items-center gap-2 border-b border-border/70 px-5 py-3.5">
-        <span className="size-2 rounded-full bg-border" />
-        <span className="size-2 rounded-full bg-border" />
-        <span className="ml-1.5 font-mono text-xs text-foreground">one connected stack</span>
-      </div>
-      <div className="relative flex min-h-0 flex-1 flex-col justify-center gap-3 px-5 py-5">
-        <span
-          aria-hidden
-          className="absolute bottom-9 left-[2.4rem] top-9 w-px bg-gradient-to-b from-prism-cyan-300 via-prism-yellow-300 to-prism-red-400"
-        />
-        {PIECES.map(({ Icon, label }) => (
-          <div
-            key={label}
-            className="relative flex items-center gap-3 rounded-xl border border-black/[0.06] bg-white px-3.5 py-2.5 shadow-[0_1px_2px_rgba(21,21,21,0.04)]"
-          >
-            <IconTile className="size-8">
-              <Icon className="size-4 text-foreground" aria-hidden />
-            </IconTile>
-            <span className="text-[0.8125rem] font-medium text-foreground">{label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  return <ComputeIllustration />;
 }
