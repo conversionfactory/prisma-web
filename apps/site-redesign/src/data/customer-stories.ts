@@ -26,6 +26,8 @@ type Quote = {
   company?: string
   /** Optional link on the company name. */
   companyHref?: string
+  /** Render one size down — for long quotes. Honored by the closing quote card. */
+  compact?: boolean
 }
 type Result = { icon: ProductIconName; stat: string; detail: string }
 
@@ -1279,6 +1281,7 @@ export const CUSTOMER_STORY_DETAILS: CustomerStoryDetail[] = [
       author: "Pieter Venter",
       role: "Sr. Software Engineer",
       company: "Invisible",
+      compact: true,
     },
     cta: {
       heading: "Build on the same stack as Invisible",

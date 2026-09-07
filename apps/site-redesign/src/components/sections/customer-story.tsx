@@ -551,7 +551,12 @@ function StoryResults({ story }: { story: CustomerStoryDetail }) {
               <Reveal delay={0.12} className="lg:h-full">
                 <figure className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-black/[0.08] bg-card p-8 shadow-[0_20px_48px_-24px_rgba(21,21,21,0.22)] sm:p-10">
                   <GlitchQuote className="h-11 md:h-14" />
-                  <blockquote className="mt-7 text-pretty text-xl font-medium leading-snug text-foreground sm:text-2xl">
+                  <blockquote
+                    className={cn(
+                      "mt-7 text-pretty font-medium leading-snug text-foreground",
+                      quote.compact ? "text-lg sm:text-xl" : "text-xl sm:text-2xl",
+                    )}
+                  >
                     {quote.text}
                   </blockquote>
                   <figcaption className="mt-auto flex flex-col items-start gap-4 pt-10 sm:flex-row sm:items-center">
