@@ -1243,13 +1243,6 @@ export const CUSTOMER_STORY_DETAILS: CustomerStoryDetail[] = [
         },
       ],
     },
-    quote: {
-      text: "Prisma's approach to type-safe ORM is next-level compared to Sequelize and even TypeORM. The tRPC + Prisma combo is insanely easy to get going with. It provides full type-safety without any codegen or messy types and interfaces to write and maintain. Prisma generates the types, tRPC consumes them and passes them down, and we don't even need to maintain any API servers. With Next.js and Vercel we also get great DX and UX at a fraction of the cost we'd usually have to pay to run our own stateful servers.",
-      author: "Pieter Venter",
-      role: "Sr. Software Engineer",
-      company: "Invisible",
-      companyHref: "https://inv.tech/",
-    },
     usage: {
       heading: "How they use Prisma",
       body: [
@@ -1280,6 +1273,12 @@ export const CUSTOMER_STORY_DETAILS: CustomerStoryDetail[] = [
             "Drastically simplified architecture and faster feature deployment than with Sequelize.",
         },
       ],
+    },
+    closingQuote: {
+      text: "Prisma's approach to type-safe ORM is next-level compared to Sequelize and even TypeORM. The tRPC + Prisma combo is insanely easy to get going with. It provides full type-safety without any codegen or messy types and interfaces to write and maintain. Prisma generates the types, tRPC consumes them and passes them down, and we don't even need to maintain any API servers. With Next.js and Vercel we also get great DX and UX at a fraction of the cost we'd usually have to pay to run our own stateful servers.",
+      author: "Pieter Venter",
+      role: "Sr. Software Engineer",
+      company: "Invisible",
     },
     cta: {
       heading: "Build on the same stack as Invisible",
