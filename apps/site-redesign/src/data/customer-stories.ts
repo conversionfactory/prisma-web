@@ -1296,7 +1296,8 @@ export const CUSTOMER_STORY_DETAILS: CustomerStoryDetail[] = [
   {
     slug: "pearly",
     name: "Pearly",
-    logo: "/logos/customers/pearly.png",
+    logo: "/logos/customers/pearly-white.webp",
+    logoAsIs: true,
     hero: {
       title: "How one developer built and scaled two dental fintech products with Prisma",
       lead: "Pearly, a HIPAA-compliant dental financial platform, built both of its products, Pearly Pay and Pearly Plan, with a single developer. Prisma abstracted away the database work, so one engineer could iterate fast on market feedback and still scale after launch.",
