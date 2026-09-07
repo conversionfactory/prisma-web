@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next"
 import { siteConfig } from "@/lib/config"
 import { getAllPosts } from "@/lib/blog"
 import { getContentSlugs } from "@/lib/content"
+import { CUSTOMER_STORY_DETAILS } from "@/data/customer-stories"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
@@ -41,8 +42,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const contentTypes = [
     { dir: "features", prefix: "features" },
     { dir: "solutions", prefix: "solutions" },
-    // No customers entry: /customers is a single index for now, and its stories
-    // link out to prisma.io/blog. Add it when /customers/[slug] lands.
     { dir: "compare", prefix: "compare" },
     { dir: "alternatives", prefix: "alternative" },
     { dir: "versus", prefix: "versus" },
@@ -56,5 +55,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   )
 
-  return [...staticRoutes, ...blogRoutes, ...contentRoutes]
+  const customerStoryRoutes = CUSTOMER_STORY_DETAILS.map((story) => ({
+    url: `${siteConfig.url}/customers/${story.slug}`,
+    lastModified: new Date(),
+  }))
+
+  return [...staticRoutes, ...blogRoutes, ...contentRoutes, ...customerStoryRoutes]
 }

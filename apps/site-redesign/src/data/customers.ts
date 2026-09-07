@@ -80,7 +80,7 @@ export type CustomerLogo = {
 
 export const CUSTOMER_STORIES: CustomerStory[] = [
   {
-    slug: "bucket",
+    slug: "reflag",
     name: "Bucket",
     title: "How Bucket Uses Prisma ORM to Make Shipping Feature Releases Faster",
     excerpt:
