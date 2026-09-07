@@ -29,7 +29,7 @@ export function CustomerStory({ story }: { story: CustomerStoryDetail }) {
       <StoryAbout story={story} />
       <StoryChallenge story={story} />
       <StoryReasons story={story} />
-      <StoryQuote quote={story.quote} story={story} />
+      {story.quote && <StoryQuote quote={story.quote} story={story} />}
       <StoryUsage story={story} />
       <StoryResults story={story} />
       <CtaBurst
@@ -417,7 +417,7 @@ function StoryQuote({
   quote,
   story,
 }: {
-  quote: CustomerStoryDetail["quote"]
+  quote: NonNullable<CustomerStoryDetail["quote"]>
   story: CustomerStoryDetail
 }) {
   const initials = quote.author
