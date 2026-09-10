@@ -49,6 +49,23 @@ export const TOPIC_LABELS: Record<string, string> = {
   "prisma-postgres": "Prisma Postgres",
 };
 
+// Subheaders for the /blog/category/[slug] pages, keyed by topic id. Like the
+// blog hero copy, these are PLACEHOLDER — written to the right shape for the
+// category header and nothing more, so approved copy can drop in without the
+// layout reflowing. A topic with no entry falls back to a generic line rather
+// than rendering an empty subhead (see the category page's resolver).
+export const TOPIC_DESCRIPTIONS: Record<string, string> = {
+  ai: "Building AI-powered apps and agents on Prisma — from retrieval to what ships in production.",
+  announcement: "Product news, releases, and the latest from the people building Prisma.",
+  "case-study": "How real teams build, ship, and scale on Prisma in production.",
+  education:
+    "Long-form engineering: the architecture decisions, benchmarks, and how things actually work.",
+  orm: "Type-safe data access with Prisma ORM — modeling, queries, migrations, and the road ahead.",
+  platform: "The tools that run your data layer in production, from the console to the query engine.",
+  "prisma-postgres":
+    "Managed Postgres for modern, serverless workloads — deep dives, patterns, and what we're shipping.",
+};
+
 // The topic roster for the hero band, in the order the band shows them. Hand
 // ordered rather than derived: the derived order is post-count descending,
 // which buries "Announcements" and puts two engineering topics side by side.
