@@ -1,5 +1,4 @@
 import { GlassGlide } from "@/components/brand/glass-glide";
-import { PrismRay } from "@/components/brand/prism-ray";
 import { Texture } from "@/components/brand/texture";
 import { SupportSearch } from "@/components/sections/support-search";
 
@@ -46,14 +45,7 @@ export function SupportHero() {
               depends on your plan and what you need.
             </p>
 
-            {/* the ray crosses the panel behind the search — its tails are the
-                only part that shows, the field itself stays opaque white */}
-            <div className="relative mt-10 w-full max-w-xl">
-              <PrismRay
-                className="left-1/2 top-1/2 h-12 w-[32rem] -translate-x-1/2 -translate-y-1/2 md:h-20 md:w-[48rem]"
-                angle={-8}
-                intensity="hero"
-              />
+            <div className="mt-10 w-full max-w-xl">
               <SupportSearch />
             </div>
           </div>

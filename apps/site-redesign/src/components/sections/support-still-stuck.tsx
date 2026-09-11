@@ -1,13 +1,15 @@
+import { PrismButtonOutline } from "@/components/brand/prism-button";
 import { Mail } from "@/components/icons/forma";
 import { Reveal } from "@/components/motion/reveal";
 
-// The closer, verbatim from the approved copy. Reuses the exact email-note
-// treatment from /contact's ContactSupport — same rounded card, Mail glyph and
-// spectrum-ink link — so the two pages land on the same final beat.
+// The closer, verbatim from the approved copy. Ends on a single centred email
+// action — the brand outline pill rather than a full-width bordered bar (that
+// treatment belongs beside a row of cards, as on /contact; standing alone here
+// it read as an empty box).
 export function SupportStillStuck() {
   return (
     <section className="bg-white px-4 pb-28 pt-14 sm:px-8">
-      <div className="mx-auto max-w-3xl text-center">
+      <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
         <Reveal>
           <h2 className="text-balance text-[clamp(1.75rem,2.75vw,2.375rem)] leading-[1.1]">
             Still stuck?
@@ -18,19 +20,13 @@ export function SupportStillStuck() {
           </p>
         </Reveal>
 
-        <Reveal delay={0.1}>
-          <p className="mt-8 flex items-center justify-center gap-2.5 rounded-2xl border border-black/[0.06] bg-card px-6 py-5 font-semibold">
-            <Mail className="size-4 shrink-0 text-muted-foreground" aria-hidden />
-            <span>
-              Email us at{" "}
-              <a
-                href="mailto:support@prisma.io"
-                className="spectrum-ink underline decoration-black/20 underline-offset-4 transition-colors hover:decoration-transparent"
-              >
-                support@prisma.io
-              </a>
+        <Reveal delay={0.1} className="mt-8">
+          <PrismButtonOutline href="mailto:support@prisma.io">
+            <span className="inline-flex items-center gap-2">
+              <Mail className="size-4" aria-hidden />
+              Email support@prisma.io
             </span>
-          </p>
+          </PrismButtonOutline>
         </Reveal>
       </div>
     </section>
