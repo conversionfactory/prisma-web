@@ -57,7 +57,11 @@ export function SupportReport() {
                   them in the open.
                 </p>
               </div>
-              <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+              {/* items-center so the pills keep their intrinsic width when
+                  stacked on mobile — otherwise the filled button's wrapper
+                  stretches to the column width and its spectrum glow spills out
+                  to the right of the shorter label. */}
+              <div className="mt-2 flex flex-col items-center gap-3 sm:flex-row">
                 <PrismButton href="https://github.com/prisma/prisma/issues/new/choose">
                   Report a bug
                 </PrismButton>
