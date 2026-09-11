@@ -1,8 +1,8 @@
 import { CtaBurst } from "@/components/sections/cta-burst";
 import { LogoCloud } from "@/components/sections/logo-cloud";
 import { TestimonialsReveal } from "@/components/sections/testimonials-reveal";
+import { UseCaseHero } from "@/components/use-case/use-case-hero";
 import { aiAgentsUseCase } from "./content";
-import { AgentHero } from "./agent-hero";
 import {
   AgentBuilds,
   AgentCompare,
@@ -25,9 +25,11 @@ const CHECK_COLORS = ["text-prism-cyan-500", "text-prism-yellow-400", "text-pris
 // Some sections are existing site components reused as-is rather than restyled,
 // so a fix to the homepage or product pages reaches this page too:
 //  - the logo strip is the homepage LogoCloud;
-//  - testimonials and the closer are the site's TestimonialsReveal and CtaBurst.
-// The hero is this page's own (see hero-options.tsx) — a purpose-built agent
-// abstraction rather than the reused homepage console.
+//  - testimonials and the closer are the site's TestimonialsReveal and CtaBurst;
+//  - the hero is the one every use-case page shares (use-case-hero.tsx). It
+//    used to be this page's own purpose-built agent console; the console went
+//    and the agent character took its place (client feedback, 2026-09-04), at
+//    which point there was nothing left for the four pages to disagree about.
 //
 // The rest are this page's own sections (see sections.tsx) — the doc's copy has
 // no slot in the /use-cases template shape.
@@ -35,7 +37,7 @@ export function AiAgentsUseCasePage() {
   const c = aiAgentsUseCase;
   return (
     <>
-      <AgentHero name={c.eyebrow} hero={c.hero} />
+      <UseCaseHero name={c.eyebrow} hero={c.hero} />
 
       <LogoCloud />
 

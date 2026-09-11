@@ -1,130 +1,19 @@
-import { GlassGlide } from "@/components/brand/glass-glide";
 import { IconTile } from "@/components/brand/icon-tile";
 import { Pattern } from "@/components/brand/pattern";
-import { PrismButton, PrismButtonOutline } from "@/components/brand/prism-button";
-import { PrismRay } from "@/components/brand/prism-ray";
-import { RoleKicker } from "@/components/brand/role-kicker";
-import { Texture } from "@/components/brand/texture";
 import { CheckBold, X } from "@/components/icons/forma";
 import { PRODUCT_ICONS } from "@/components/product/icons";
 import { ProductNarrative } from "@/components/product/product-narrative";
-import type { ProductPageContent } from "@/components/product/types";
 import { Reveal } from "@/components/motion/reveal";
 import { cn } from "@/lib/utils";
 import type { SegmentUseCaseContent } from "./types";
 
 // Shared sections for the audience use-case pages — the same idioms as the
-// AI-agents page (hero with a full-height visual, an illustrated narrative,
-// icon-card grids, an asymmetric fit split, card rows), generalised to take
-// per-page content and abstractions. The comparison table is its own file.
+// AI-agents page (an illustrated narrative, icon-card grids, an asymmetric fit
+// split, card rows), generalised to take per-page content and abstractions.
+// The hero is the one every use-case page shares (use-case-hero.tsx) and the
+// comparison table is its own file.
 
 const HEADING = "text-balance text-[clamp(1.75rem,2.75vw,2.375rem)] leading-[1.1]";
-const CHECK_COLORS = ["text-prism-cyan-500", "text-prism-yellow-400", "text-prism-red-500"];
-
-type Hero = ProductPageContent["hero"];
-
-function Headline({ headline, emphasis }: { headline: string; emphasis?: string }) {
-  const at = emphasis ? headline.indexOf(emphasis) : -1;
-  if (!emphasis || at === -1) return <>{headline}</>;
-  return (
-    <>
-      {headline.slice(0, at)}
-      <GlassGlide>{emphasis}</GlassGlide>
-      {headline.slice(at + emphasis.length)}
-    </>
-  );
-}
-
-// The hero: copy left, a purpose-built visual filling the column on the right
-// (same proportion as the AI-agents hero — 16px subhead, items-stretch so the
-// visual is the full height of the copy).
-export function SegmentHero({
-  name,
-  hero,
-  visual,
-}: {
-  name: string;
-  hero: Hero;
-  visual: React.ReactNode;
-}) {
-  const paras = Array.isArray(hero.subheadline) ? hero.subheadline : [hero.subheadline];
-  return (
-    <section className="bg-white px-3 pt-3 sm:px-4 sm:pt-4">
-      <div className="relative mx-auto max-w-[96rem] overflow-hidden rounded-[1.5rem] border border-black/[0.06] bg-white">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-[30rem] overflow-hidden"
-        >
-          <div
-            className="absolute -bottom-1/3 left-1/2 h-[120%] w-[160%] -translate-x-1/2"
-            style={{
-              background: [
-                "radial-gradient(52% 40% at 30% 100%, color-mix(in srgb, var(--color-prism-cyan-400) 34%, transparent), transparent 68%)",
-                "radial-gradient(44% 36% at 52% 100%, color-mix(in srgb, var(--color-prism-yellow-300) 26%, transparent), transparent 66%)",
-                "radial-gradient(42% 30% at 74% 100%, color-mix(in srgb, var(--color-prism-red-400) 28%, transparent), transparent 68%)",
-              ].join(","),
-            }}
-          />
-          <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-t from-transparent via-white/60 to-white" />
-        </div>
-        <Texture opacity={0.06} blend="multiply" />
-
-        <div className="relative px-4 sm:px-8">
-          <div className="mx-auto grid max-w-site items-stretch gap-12 pb-20 pt-36 md:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)] md:pb-28 md:pt-44 lg:gap-16">
-            <div className="flex flex-col items-start justify-center">
-              <RoleKicker color="bg-prism-cyan-400">{name}</RoleKicker>
-              <h1 className="isolate mt-4 max-w-[min(16ch,100%)] text-balance text-[clamp(2.25rem,3.2vw,2.875rem)] leading-[1.08]">
-                <Headline headline={hero.headline} emphasis={hero.headlineEmphasis} />
-              </h1>
-              {paras.map((para, i) => (
-                <p
-                  key={i}
-                  className={cn(
-                    "max-w-[46ch] text-pretty text-base leading-relaxed text-muted-foreground",
-                    i === 0 ? "mt-5" : "mt-4",
-                  )}
-                >
-                  {para}
-                </p>
-              ))}
-              <ul className="mt-7 flex flex-col gap-2.5">
-                {hero.benefits.map((label, i) => (
-                  <li
-                    key={i}
-                    className="flex items-start gap-2 text-[0.9375rem] font-semibold text-foreground"
-                  >
-                    <CheckBold
-                      className={cn("mt-0.5 size-4 shrink-0", CHECK_COLORS[i % 3])}
-                      aria-hidden
-                    />
-                    {label}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-8 flex flex-wrap items-center gap-4">
-                <PrismButton href={hero.primaryCta.href} size="lg">
-                  {hero.primaryCta.label}
-                </PrismButton>
-                <PrismButtonOutline href={hero.secondaryCta.href} size="lg">
-                  {hero.secondaryCta.label}
-                </PrismButtonOutline>
-              </div>
-            </div>
-
-            <div className="relative min-w-0 self-stretch max-md:mt-2">
-              <PrismRay
-                className="left-[75%] top-1/2 h-12 w-[32rem] -translate-x-1/2 -translate-y-1/2 md:h-24 md:w-[64rem]"
-                angle={-50}
-                intensity="hero"
-              />
-              <div className="relative flex h-full max-md:aspect-[4/5]">{visual}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // "What Prisma is for … / Why … use Prisma" — the /orm narrative shape: copy on
 // the left, a purpose-built 1:1 abstraction on the right, the copy centred to it.

@@ -1,15 +1,9 @@
 import { CtaBurst } from "@/components/sections/cta-burst";
 import { LogoCloud } from "@/components/sections/logo-cloud";
 import { TestimonialsReveal } from "@/components/sections/testimonials-reveal";
+import { UseCaseHero } from "@/components/use-case/use-case-hero";
 import { ComparisonTable } from "./comparison-table";
-import {
-  SegmentBuilds,
-  SegmentFit,
-  SegmentHero,
-  SegmentIntro,
-  SegmentWhen,
-  SegmentWhyChoose,
-} from "./sections";
+import { SegmentBuilds, SegmentFit, SegmentIntro, SegmentWhen, SegmentWhyChoose } from "./sections";
 import type { SegmentUseCaseContent } from "./types";
 
 const CHECK_COLORS = ["text-prism-cyan-500", "text-prism-yellow-400", "text-prism-red-500"];
@@ -19,21 +13,20 @@ const CHECK_COLORS = ["text-prism-cyan-500", "text-prism-yellow-400", "text-pris
 //   hero → logo strip → what Prisma is → when to use → is it the right fit →
 //   [why choose] → comparison table → what they build → testimonials → closer
 //
-// The hero and intro visuals are per-page abstractions passed in; everything
-// else is driven by the page's content object.
+// The hero is the shared use-case hero, which carries the agent character
+// rather than a per-page abstraction; the intro visual is still passed in.
+// Everything else is driven by the page's content object.
 export function SegmentPage({
   content,
-  heroVisual,
   introVisual,
 }: {
   content: SegmentUseCaseContent;
-  heroVisual: React.ReactNode;
   introVisual: React.ReactNode;
 }) {
   const c = content;
   return (
     <>
-      <SegmentHero name={c.eyebrow} hero={c.hero} visual={heroVisual} />
+      <UseCaseHero name={c.eyebrow} hero={c.hero} />
 
       <LogoCloud />
 
