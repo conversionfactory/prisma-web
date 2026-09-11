@@ -1,13 +1,13 @@
-import { CheckBold } from "@/components/icons/forma"
-import { GlassPrismSpin } from "@/components/brand/glass-prism-spin"
-import { PrismButton, PrismButtonOutline } from "@/components/brand/prism-button"
-import { Texture } from "@/components/brand/texture"
-import { Reveal } from "@/components/motion/reveal"
-import { cn } from "@/lib/utils"
+import { CheckBold } from "@/components/icons/forma";
+import { GlassPrismSpin } from "@/components/brand/glass-prism-spin";
+import { PrismButton, PrismButtonOutline } from "@/components/brand/prism-button";
+import { Texture } from "@/components/brand/texture";
+import { Reveal } from "@/components/motion/reveal";
+import { cn } from "@/lib/utils";
 
 // Spectrum bloom behind the glass prisms (same treatment as the hero corner).
 const SPECTRUM =
-  "conic-gradient(var(--color-prism-yellow-300), var(--color-prism-red-500) 32%, var(--color-prism-cyan-400) 64%, var(--color-prism-yellow-300))"
+  "conic-gradient(var(--color-prism-yellow-300), var(--color-prism-red-500) 32%, var(--color-prism-cyan-400) 64%, var(--color-prism-yellow-300))";
 
 // The homepage closing CTA — the abstraction idiom scaled to the pitch
 // itself: a video card (32px padding, drifting clouds — pre-processed to
@@ -20,21 +20,21 @@ const CHECKS = [
   { label: "Built for how your agent ships now", color: "text-prism-cyan-500" },
   { label: "Postgres and hosting when you need them", color: "text-prism-yellow-400" },
   { label: "Type-safe ORM, free and always will be", color: "text-prism-red-500" },
-] as const
+] as const;
 
-type Cta = { label: string; href: string }
+type Cta = { label: string; href: string };
 
 type CtaBurstProps = {
-  headline?: React.ReactNode
+  headline?: React.ReactNode;
   /** Override the headline measure (default max-w-[20ch]) when custom copy needs longer lines. */
-  headlineMaxWidth?: string
+  headlineMaxWidth?: string;
   /** Override the body measure (default max-w-[52ch]). */
-  bodyMaxWidth?: string
-  body?: string
-  checks?: readonly { label: string; color: string }[]
-  primaryCta?: Cta
-  secondaryCta?: Cta
-}
+  bodyMaxWidth?: string;
+  body?: string;
+  checks?: readonly { label: string; color: string; ownLine?: boolean }[];
+  primaryCta?: Cta;
+  secondaryCta?: Cta;
+};
 
 export function CtaBurst({
   headline = "Ready to let your agent run the full loop?",
@@ -112,23 +112,38 @@ export function CtaBurst({
                 the page */}
             <div className="relative flex flex-col items-start px-6 py-16 text-left sm:items-center sm:px-10 sm:py-20 sm:text-center">
               <Reveal>
-                <h2 className={cn(headlineMaxWidth, "text-balance text-[clamp(2rem,3.2vw,2.75rem)] leading-[1.08]")}>
+                <h2
+                  className={cn(
+                    headlineMaxWidth,
+                    "text-balance text-[clamp(2rem,3.2vw,2.75rem)] leading-[1.08]",
+                  )}
+                >
                   {headline}
                 </h2>
               </Reveal>
 
               <Reveal delay={0.08}>
-                <p className={cn("mt-5 text-pretty leading-relaxed text-muted-foreground", bodyMaxWidth)}>
+                <p
+                  className={cn(
+                    "mt-5 text-pretty leading-relaxed text-muted-foreground",
+                    bodyMaxWidth,
+                  )}
+                >
                   {body}
                 </p>
               </Reveal>
 
               <Reveal delay={0.16}>
                 <ul className="mt-7 flex flex-wrap items-center justify-start gap-x-7 gap-y-3 sm:justify-center">
-                  {checks.map(({ label, color }, i) => (
+                  {checks.map(({ label, color, ownLine }, i) => (
                     <li
                       key={i}
-                      className="flex items-start gap-2 text-left text-[15px] font-semibold text-foreground"
+                      className={cn(
+                        "flex items-start gap-2 text-left text-[15px] font-semibold text-foreground",
+                        // a long check reads better on its own line under the
+                        // shorter two, rather than stretching the single row
+                        ownLine && "sm:basis-full sm:justify-center",
+                      )}
                     >
                       <CheckBold className={cn("mt-0.5 size-4 shrink-0", color)} aria-hidden />
                       {label}
@@ -137,14 +152,19 @@ export function CtaBurst({
                 </ul>
               </Reveal>
 
-              <Reveal delay={0.24} className="mt-9 flex flex-wrap items-center justify-start gap-3 sm:justify-center">
+              <Reveal
+                delay={0.24}
+                className="mt-9 flex flex-wrap items-center justify-start gap-3 sm:justify-center"
+              >
                 <PrismButton href={primaryCta.href}>{primaryCta.label}</PrismButton>
-                <PrismButtonOutline href={secondaryCta.href}>{secondaryCta.label}</PrismButtonOutline>
+                <PrismButtonOutline href={secondaryCta.href}>
+                  {secondaryCta.label}
+                </PrismButtonOutline>
               </Reveal>
             </div>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }
