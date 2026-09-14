@@ -19,6 +19,7 @@ import {
   NotebookTabs,
   Plug,
   Rocket,
+  SquarePen,
   Terminal,
   X,
 } from "lucide-react";
@@ -120,7 +121,11 @@ function Tile({
           <img
             src={src}
             alt=""
-            className={cn("size-5 object-contain", darkSrc && "dark:hidden", invertDark && "dark:invert")}
+            className={cn(
+              "size-5 object-contain",
+              darkSrc && "dark:hidden",
+              invertDark && "dark:invert",
+            )}
           />
           {darkSrc && (
             // eslint-disable-next-line @next/next/no-img-element
@@ -212,7 +217,11 @@ function AgentPrompt({
   const [checked, copy] = useCopy();
   const copyBtn = (
     <Button size="sm" onClick={() => copy(prompt)}>
-      {checked ? <Check className="size-3.5" aria-hidden /> : <Copy className="size-3.5" aria-hidden />}
+      {checked ? (
+        <Check className="size-3.5" aria-hidden />
+      ) : (
+        <Copy className="size-3.5" aria-hidden />
+      )}
       Copy prompt
     </Button>
   );
@@ -230,7 +239,13 @@ function AgentPrompt({
           <span className="spectrum-link">{guideTitle}</span>
           <ArrowRight className="size-3.5" aria-hidden />
         </a>
-        <Button variant="outline" size="sm" onClick={() => setOpen(true)} aria-haspopup="dialog" aria-expanded={open}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setOpen(true)}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+        >
           <ChevronDown className="size-3.5" aria-hidden />
           View
         </Button>
@@ -270,7 +285,11 @@ function CopyMarkdown({ markdownUrl }: { markdownUrl: string }) {
   };
   return (
     <Button variant="outline" size="sm" disabled={loading} onClick={onClick}>
-      {checked ? <Check className="size-3.5" aria-hidden /> : <Copy className="size-3.5" aria-hidden />}
+      {checked ? (
+        <Check className="size-3.5" aria-hidden />
+      ) : (
+        <Copy className="size-3.5" aria-hidden />
+      )}
       Copy Markdown
     </Button>
   );
@@ -349,10 +368,15 @@ function ViewOptions({ markdownUrl, githubUrl }: { markdownUrl: string; githubUr
               <span className="flex min-w-0 flex-col">
                 <span>{item.title}</span>
                 {item.description && (
-                  <span className="text-xs font-normal text-muted-foreground">{item.description}</span>
+                  <span className="text-xs font-normal text-muted-foreground">
+                    {item.description}
+                  </span>
                 )}
               </span>
-              <ArrowUpRight className="ms-auto size-3.5 shrink-0 text-muted-foreground" aria-hidden />
+              <ArrowUpRight
+                className="ms-auto size-3.5 shrink-0 text-muted-foreground"
+                aria-hidden
+              />
             </a>
           </DropdownMenuItem>
         ))}
@@ -374,11 +398,17 @@ function OtherSetups() {
             Existing project, your own database, or a single product on its own
           </span>
           <span className="block text-xs text-muted-foreground">
-            Five paths: add to an existing project, bring your own Postgres, or use the ORM, Postgres,
-            or Compute alone.
+            Five paths: add to an existing project, bring your own Postgres, or use the ORM,
+            Postgres, or Compute alone.
           </span>
         </span>
-        <Button variant="outline" size="sm" onClick={() => setOpen(true)} aria-haspopup="dialog" aria-expanded={open}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setOpen(true)}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+        >
           <ChevronDown className="size-3.5" aria-hidden />
           View
         </Button>
@@ -424,27 +454,43 @@ function slug(title: string) {
     .replace(/\s+/g, "-");
 }
 
+// The prism accents cycle through the brand palette so each panel reads as its
+// own stop rather than one long list.
+const SECTION_ACCENTS = ["bg-prism-cyan-400", "bg-prism-yellow-300", "bg-prism-red-500"];
+
+// A section rendered as a self-contained halo panel: rounded brand card wearing
+// the prism glow, numbered eyebrow, header stacked above the content.
 function SectionRow({
+  index,
   title,
   description,
   children,
 }: {
+  index: number;
   title: string;
   description: string;
   children: ReactNode;
 }) {
   const id = slug(title);
+  const accent = SECTION_ACCENTS[index % SECTION_ACCENTS.length];
   return (
-    <section className="grid gap-x-12 gap-y-6 border-t border-black/[0.06] py-16 md:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]">
-      <div>
-        <h2 id={id} className="scroll-mt-28 text-2xl leading-tight">
-          {title}
-        </h2>
-        <p className="mt-3 max-w-sm text-[0.9375rem] leading-7 text-muted-foreground">
-          <InlineCode text={description} />
-        </p>
-      </div>
-      <div className="min-w-0">{children}</div>
+    <section className="relative isolate overflow-hidden rounded-2xl border border-black/[0.06] bg-gradient-to-br from-prism-cyan-50/50 via-card to-card p-6 sm:p-8">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-16 -top-16 -z-10 size-56 rounded-full opacity-[0.13] blur-[46px]"
+        style={{ background: HALO }}
+      />
+      <span className="inline-flex items-center gap-2 font-mono text-xs font-medium tracking-[0.14em] text-muted-foreground">
+        <span aria-hidden className={cn("size-1.5 rounded-full", accent)} />
+        {String(index + 1).padStart(2, "0")}
+      </span>
+      <h2 id={id} className="mt-2 scroll-mt-28 text-2xl leading-tight">
+        {title}
+      </h2>
+      <p className="mt-2 max-w-2xl text-[0.9375rem] leading-7 text-muted-foreground">
+        <InlineCode text={description} />
+      </p>
+      <div className="mt-6 min-w-0">{children}</div>
     </section>
   );
 }
@@ -469,7 +515,17 @@ type LinkTile = {
   badge?: string;
 };
 
-function IconLink({ href, title, src, darkSrc, invertDark, mono, icon, description, badge }: LinkTile) {
+function IconLink({
+  href,
+  title,
+  src,
+  darkSrc,
+  invertDark,
+  mono,
+  icon,
+  description,
+  badge,
+}: LinkTile) {
   return (
     <a
       href={href}
@@ -487,7 +543,9 @@ function IconLink({ href, title, src, darkSrc, invertDark, mono, icon, descripti
           {badge && <Badge>{badge}</Badge>}
         </span>
         {description && (
-          <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{description}</span>
+          <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">
+            {description}
+          </span>
         )}
       </span>
     </a>
@@ -572,7 +630,8 @@ const BUILD: LinkTile[] = [
     title: "Composer",
     badge: "Early Access",
     icon: <Blocks />,
-    description: "Declare your services and the resources they depend on: databases, jobs, buckets, secrets.",
+    description:
+      "Declare your services and the resources they depend on: databases, jobs, buckets, secrets.",
   },
   {
     href: `${D}/orm`,
@@ -583,28 +642,67 @@ const BUILD: LinkTile[] = [
 ];
 
 const DEPLOY: LinkTile[] = [
-  { href: `${D}/compute`, title: "Compute", icon: <Cpu />, description: "Hosting for your services, next to your data." },
-  { href: `${D}/storage`, title: "Storage", icon: <BucketIcon />, description: "S3-compatible object storage inside your project." },
-  { href: `${D}/postgres`, title: "Postgres", icon: <Database />, description: "Managed PostgreSQL, provisioned during setup." },
+  {
+    href: `${D}/compute`,
+    title: "Compute",
+    icon: <Cpu />,
+    description: "Hosting for your services, next to your data.",
+  },
+  {
+    href: `${D}/storage`,
+    title: "Storage",
+    icon: <BucketIcon />,
+    description: "S3-compatible object storage inside your project.",
+  },
+  {
+    href: `${D}/postgres`,
+    title: "Postgres",
+    icon: <Database />,
+    description: "Managed PostgreSQL, provisioned during setup.",
+  },
   {
     href: `${D}/prisma-compute/deploy`,
     title: "Deploy",
     icon: <Rocket />,
-    description: "Ship from a git push, the Console, or Composer. Every branch gets its own environment.",
+    description:
+      "Ship from a git push, the Console, or Composer. Every branch gets its own environment.",
   },
 ];
 
 const FRAMEWORKS: LinkTile[] = [
-  { href: `${D}/guides/frameworks/nextjs`, title: "Next.js", src: "/img/technologies/nextjs.svg", invertDark: true },
+  {
+    href: `${D}/guides/frameworks/nextjs`,
+    title: "Next.js",
+    src: "/img/technologies/nextjs.svg",
+    invertDark: true,
+  },
   { href: `${D}/guides/frameworks/hono`, title: "Hono", src: "/img/technologies/hono.svg" },
-  { href: `${D}/guides/frameworks/tanstack-start`, title: "TanStack Start", src: "/img/technologies/tanstack.svg" },
+  {
+    href: `${D}/guides/frameworks/tanstack-start`,
+    title: "TanStack Start",
+    src: "/img/technologies/tanstack.svg",
+  },
   { href: `${D}/guides/frameworks/nestjs`, title: "NestJS", src: "/img/technologies/nestjs.svg" },
-  { href: `${D}/guides/frameworks/astro`, title: "Astro", src: "/img/technologies/astro.svg", darkSrc: "/img/technologies/astrodark.svg" },
+  {
+    href: `${D}/guides/frameworks/astro`,
+    title: "Astro",
+    src: "/img/technologies/astro.svg",
+    darkSrc: "/img/technologies/astrodark.svg",
+  },
   { href: `${D}/guides/frameworks/nuxt`, title: "Nuxt", src: "/img/technologies/nuxtjs.svg" },
-  { href: `${D}/guides/frameworks/sveltekit`, title: "SvelteKit", src: "/img/technologies/sveltekit.svg" },
+  {
+    href: `${D}/guides/frameworks/sveltekit`,
+    title: "SvelteKit",
+    src: "/img/technologies/sveltekit.svg",
+  },
   { href: `${D}/guides/runtimes/bun`, title: "Bun", src: "/img/technologies/bun.svg" },
   { href: `${D}/guides/frameworks/elysia`, title: "Elysia", mono: "E" },
-  { href: `${D}/guides/runtimes/deno`, title: "Deno", src: "/img/technologies/deno.svg", invertDark: true },
+  {
+    href: `${D}/guides/runtimes/deno`,
+    title: "Deno",
+    src: "/img/technologies/deno.svg",
+    invertDark: true,
+  },
 ];
 
 const ORM7: LinkTile[] = [
@@ -624,11 +722,36 @@ const ORM7: LinkTile[] = [
 ];
 
 const BROWSE: LinkTile[] = [
-  { href: `${D}/orm`, title: "Prisma ORM", description: "Prisma ORM 8, with Prisma ORM 7 docs", icon: <Boxes /> },
-  { href: `${D}/postgres`, title: "Prisma Postgres", description: "The managed database", icon: <Database /> },
-  { href: `${D}/compute`, title: "Prisma Compute", description: "Hosting and branching", icon: <Cpu /> },
-  { href: `${D}/cli`, title: "CLI reference", description: "Every command and flag", icon: <Terminal /> },
-  { href: `${D}/guides`, title: "Guides", description: "Frameworks and workflows", icon: <NotebookTabs /> },
+  {
+    href: `${D}/orm`,
+    title: "Prisma ORM",
+    description: "Prisma ORM 8, with Prisma ORM 7 docs",
+    icon: <Boxes />,
+  },
+  {
+    href: `${D}/postgres`,
+    title: "Prisma Postgres",
+    description: "The managed database",
+    icon: <Database />,
+  },
+  {
+    href: `${D}/compute`,
+    title: "Prisma Compute",
+    description: "Hosting and branching",
+    icon: <Cpu />,
+  },
+  {
+    href: `${D}/cli`,
+    title: "CLI reference",
+    description: "Every command and flag",
+    icon: <Terminal />,
+  },
+  {
+    href: `${D}/guides`,
+    title: "Guides",
+    description: "Frameworks and workflows",
+    icon: <NotebookTabs />,
+  },
   { href: `${D}/ai`, title: "AI tools", description: "Skills, MCP, and prompts", icon: <Bot /> },
 ];
 
@@ -654,11 +777,14 @@ export function DocsGettingStarted() {
               ].join(","),
             }}
           />
-          <PrismRay intensity="structural" className="left-[24%] top-[52%] h-12 w-[90rem] -translate-y-1/2" />
+          <PrismRay
+            intensity="structural"
+            className="left-[24%] top-[52%] h-12 w-[90rem] -translate-y-1/2"
+          />
         </div>
 
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <h1 className="max-w-[20ch] text-balance text-[clamp(2.25rem,4vw,3.25rem)] leading-[1.05]">
+          <h1 className="max-w-[20ch] text-balance text-[clamp(2rem,3.2vw,2.75rem)] leading-[1.08]">
             Get started with Prisma
           </h1>
           <div className="flex shrink-0 items-center gap-2">
@@ -673,8 +799,8 @@ export function DocsGettingStarted() {
           <div className="max-w-[68ch] space-y-2 text-[1.0625rem] leading-relaxed text-foreground/80">
             <p>
               Prisma is a complete TypeScript stack with one workflow:{" "}
-              <strong className="font-semibold text-foreground">build</strong> your app and run all of
-              it on your machine, then{" "}
+              <strong className="font-semibold text-foreground">build</strong> your app and run all
+              of it on your machine, then{" "}
               <strong className="font-semibold text-foreground">deploy</strong> it to the Prisma
               platform with one command. Check out the{" "}
               <InlineLink href={`${D}/full-stack-tutorial`}>full-stack tutorial</InlineLink>.
@@ -694,7 +820,10 @@ export function DocsGettingStarted() {
               description="Define the app in TypeScript and run everything locally before you ship."
               links={BUILD}
             />
-            <span className="flex items-center justify-center self-center text-muted-foreground/70" aria-hidden>
+            <span
+              className="flex items-center justify-center self-center text-muted-foreground/70"
+              aria-hidden
+            >
               <ArrowDown className="size-5 lg:hidden" />
               <ArrowRight className="hidden size-5 lg:block" />
             </span>
@@ -721,56 +850,97 @@ export function DocsGettingStarted() {
         </div>
       </div>
 
-      {/* Pick your framework */}
-      <SectionRow
-        title="Pick your framework"
-        description="Every guide runs the same journey with the same commands: scaffold, connect Prisma Postgres, run a real query, and deploy. SvelteKit and Deno don't deploy to Compute yet; their guides stop at a verified local run."
-      >
-        <IconGrid columns={3}>
-          {FRAMEWORKS.map((f) => (
-            <IconLink key={f.href} {...f} />
-          ))}
-        </IconGrid>
-        <p className="mt-7 text-sm leading-7 text-muted-foreground">
-          If you&apos;re using Express or another Node.js server, follow the{" "}
-          <InlineLink href={`${D}/prisma-orm/add-to-existing-project/postgresql`}>
-            existing-project path
-          </InlineLink>{" "}
-          instead.
-        </p>
-      </SectionRow>
+      {/* Section panels */}
+      <div className="mt-4 flex flex-col gap-6">
+        {/* Pick your framework */}
+        <SectionRow
+          index={0}
+          title="Pick your framework"
+          description="Every guide runs the same journey with the same commands: scaffold, connect Prisma Postgres, run a real query, and deploy. SvelteKit and Deno don't deploy to Compute yet; their guides stop at a verified local run."
+        >
+          <IconGrid columns={3}>
+            {FRAMEWORKS.map((f) => (
+              <IconLink key={f.href} {...f} />
+            ))}
+          </IconGrid>
+          <p className="mt-7 text-sm leading-7 text-muted-foreground">
+            If you&apos;re using Express or another Node.js server, follow the{" "}
+            <InlineLink href={`${D}/prisma-orm/add-to-existing-project/postgresql`}>
+              existing-project path
+            </InlineLink>{" "}
+            instead.
+          </p>
+        </SectionRow>
 
-      {/* Prisma ORM 7 */}
-      <SectionRow
-        title="Prisma ORM 7"
-        description="Prisma ORM 7 remains fully supported. Scaffold it with `npx create-prisma@stable`, or add it to an existing project with `npx prisma@7.10.0 init`. It pairs with Prisma Postgres and Prisma Compute the same way. When you're ready, Prisma ORM 8 is the upgrade path."
-      >
-        <IconGrid>
-          {ORM7.map((l) => (
-            <IconLink key={l.href} {...l} />
-          ))}
-        </IconGrid>
-      </SectionRow>
+        {/* Prisma ORM 7 */}
+        <SectionRow
+          index={1}
+          title="Prisma ORM 7"
+          description="Prisma ORM 7 remains fully supported. Scaffold it with `npx create-prisma@stable`, or add it to an existing project with `npx prisma@7.10.0 init`. It pairs with Prisma Postgres and Prisma Compute the same way. When you're ready, Prisma ORM 8 is the upgrade path."
+        >
+          <IconGrid>
+            {ORM7.map((l) => (
+              <IconLink key={l.href} {...l} />
+            ))}
+          </IconGrid>
+        </SectionRow>
 
-      {/* Other setups */}
-      <SectionRow
-        title="Other setups"
-        description="If you already have an app or a database, or need a single Prisma product on its own, each path below has a guide to follow and a prompt to hand to your agent."
-      >
-        <OtherSetups />
-      </SectionRow>
+        {/* Other setups */}
+        <SectionRow
+          index={2}
+          title="Other setups"
+          description="If you already have an app or a database, or need a single Prisma product on its own, each path below has a guide to follow and a prompt to hand to your agent."
+        >
+          <OtherSetups />
+        </SectionRow>
 
-      {/* Browse the docs */}
-      <SectionRow
-        title="Browse the docs"
-        description="This page hides the full navigation to keep the first run focused. These links open the full docs for each product."
-      >
-        <IconGrid columns={3}>
-          {BROWSE.map((l) => (
-            <IconLink key={l.href} {...l} />
-          ))}
-        </IconGrid>
-      </SectionRow>
+        {/* Browse the docs */}
+        <SectionRow
+          index={3}
+          title="Browse the docs"
+          description="This page hides the full navigation to keep the first run focused. These links open the full docs for each product."
+        >
+          <IconGrid columns={3}>
+            {BROWSE.map((l) => (
+              <IconLink key={l.href} {...l} />
+            ))}
+          </IconGrid>
+        </SectionRow>
+      </div>
+
+      {/* Footer: edit link + the next-page nav card (right-aligned, as on the
+          live docs — the only pagination card since this is the first page). */}
+      <footer className="mt-10 flex flex-col gap-6">
+        <div>
+          <Button variant="outline" size="sm" asChild>
+            <a
+              href="https://github.com/prisma/web/edit/main/apps/docs/content/docs/(index)/index.mdx"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <SquarePen className="size-3.5" aria-hidden />
+              Edit on GitHub
+            </a>
+          </Button>
+        </div>
+        <a
+          href={`${D}/getting-started`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex flex-col items-end rounded-xl border border-black/[0.06] bg-card p-5 text-right shadow-[0_1px_2px_rgba(21,21,21,0.04)] transition-[box-shadow,border-color] hover:border-black/10 hover:shadow-[0_1px_2px_rgba(21,21,21,0.04),0_14px_28px_-20px_rgba(21,21,21,0.25)]"
+        >
+          <span className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+            Choose a Prisma ORM setup path
+            <ArrowRight
+              className="size-3.5 transition-transform group-hover:translate-x-0.5"
+              aria-hidden
+            />
+          </span>
+          <span className="mt-1 text-sm leading-6 text-muted-foreground">
+            Choose the fastest path to try Prisma ORM in a new or existing project.
+          </span>
+        </a>
+      </footer>
     </div>
   );
 }
