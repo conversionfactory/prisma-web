@@ -41,41 +41,36 @@ export type ChangelogEntry = {
 // and the filter tab always agree.
 export const CATEGORY_META: Record<
   ChangelogCategory,
-  { label: string; dot: string; text: string; ring: string; glow: string }
+  { label: string; dot: string; text: string; glow: string }
 > = {
   compute: {
     label: "Compute",
     dot: "bg-prism-cyan-400",
     text: "text-prism-cyan-700",
-    ring: "ring-prism-cyan-400/30",
     glow: "var(--color-prism-cyan-400)",
   },
   orm: {
     label: "ORM",
     dot: "bg-prism-red-500",
     text: "text-prism-red-700",
-    ring: "ring-prism-red-500/30",
     glow: "var(--color-prism-red-500)",
   },
   postgres: {
     label: "Postgres",
     dot: "bg-prism-yellow-400",
     text: "text-prism-yellow-700",
-    ring: "ring-prism-yellow-400/40",
     glow: "var(--color-prism-yellow-400)",
   },
   studio: {
     label: "Studio",
     dot: "bg-prism-cyan-600",
     text: "text-prism-cyan-800",
-    ring: "ring-prism-cyan-600/30",
     glow: "var(--color-prism-cyan-600)",
   },
   platform: {
     label: "Platform",
     dot: "bg-foreground",
     text: "text-foreground",
-    ring: "ring-foreground/20",
     glow: "var(--primary)",
   },
 };

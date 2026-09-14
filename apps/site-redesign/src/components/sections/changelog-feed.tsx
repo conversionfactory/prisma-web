@@ -62,7 +62,10 @@ export function ChangelogFeed() {
               label="All updates"
               count={CHANGELOG.length}
             />
-            {CATEGORY_ORDER.map((id) => (
+            {/* Only categories that actually have entries — a zero-count tab
+                dead-ends to a blank timeline. Same rule blog-browser applies to
+                its topic chips. */}
+            {CATEGORY_ORDER.filter((id) => (COUNTS[id] ?? 0) > 0).map((id) => (
               <FilterPill
                 key={id}
                 active={filter === id}
