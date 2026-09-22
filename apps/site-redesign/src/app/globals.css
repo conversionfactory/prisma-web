@@ -763,29 +763,42 @@ h6 {
   }
 }
 
-/* Gradient underline for inline text links. Drawn on the text's own box (not an
+/* Underline for inline text links. Drawn on the text's own box (not an
    absolutely-positioned ::after) so it hugs the text at a fixed offset
    regardless of line-height, matches the text width exactly, and clones across
-   line wraps — the ::after version mismeasures wrapping prose. Always visible;
-   slides on the X axis only so it stays pinned to the baseline. */
+   line wraps — the ::after version mismeasures wrapping prose. At rest it's a
+   quiet 1px line so clusters of links don't read as noise; the animated brand
+   gradient is revealed only on hover/focus. */
 .spectrum-link {
+  background-image: linear-gradient(
+    to right,
+    color-mix(in srgb, currentColor 32%, transparent),
+    color-mix(in srgb, currentColor 32%, transparent)
+  );
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 1px;
+  padding-bottom: 2px;
+  transition: background-size 0.2s ease;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.spectrum-link:hover,
+.spectrum-link:focus-visible {
   background-image: linear-gradient(85deg, #01d7e4, #f3c306, #f37a03, #f43531, #f00e5c, #01d7e4);
   /* repeat-x so the sliding gradient tiles seamlessly across the width; a single
      2px band is pinned to the bottom via background-position-y (no-repeat would
      let the 200%-wide image slide fully off and the line would vanish/snap). */
   background-repeat: repeat-x;
-  /* Shorthand kept in both the base rule and every keyframe so the vertical
-     position stays pinned to the bottom (100%) — animating the -x longhand
-     alone resets -y to the top and the line vanishes above the text. */
-  background-position: 0 100%;
   background-size: 200% 2px;
-  padding-bottom: 3px;
   animation: spectrum-link-slide 2.5s linear infinite;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
 }
 
 @keyframes spectrum-link-slide {
+  /* Shorthand keeps the vertical position pinned to the bottom (100%) —
+     animating the -x longhand alone resets -y to the top and the line vanishes
+     above the text. */
   from {
     background-position: 0 100%;
   }
@@ -795,7 +808,8 @@ h6 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .spectrum-link {
+  .spectrum-link:hover,
+  .spectrum-link:focus-visible {
     animation: none;
   }
 }

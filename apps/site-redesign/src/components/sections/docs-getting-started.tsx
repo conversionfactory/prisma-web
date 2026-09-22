@@ -3,7 +3,6 @@
 import {
   ArrowDown,
   ArrowRight,
-  ArrowUpRight,
   Blocks,
   Bot,
   Boxes,
@@ -29,11 +28,11 @@ import { PrismRay } from "@/components/brand/prism-ray";
 import { BucketIcon } from "@/components/icons/bucket";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { DOCS_SETUPS } from "@/data/docs-setups";
 import { cn } from "@/lib/utils";
 
@@ -319,69 +318,59 @@ function AnthropicMark() {
   );
 }
 
-// The live docs "Open" dropdown: open the page's markdown in an LLM or on GitHub.
-function ViewOptions({ markdownUrl, githubUrl }: { markdownUrl: string; githubUrl: string }) {
+// Open the page's markdown in an LLM (or on GitHub). Exposed inline — one button
+// per tool — so it's immediately obvious the docs open in your favourite AI tool.
+function OpenInTools({ markdownUrl, githubUrl }: { markdownUrl: string; githubUrl: string }) {
   const q = `Read ${markdownUrl}, I want to ask questions about it.`;
   const items = [
-    { title: "Open in GitHub", href: githubUrl, icon: <GithubMark /> },
     {
-      title: "Open in ChatGPT",
+      title: "ChatGPT",
       href: `https://chatgpt.com/?${new URLSearchParams({ hints: "search", q })}`,
       icon: <OpenAIMark />,
     },
     {
-      title: "Open in Claude",
+      title: "Claude",
       href: `https://claude.ai/new?${new URLSearchParams({ q })}`,
-      description: "Claude previews the prompt and asks you to confirm",
+      description: "Previews the prompt and asks you to confirm",
       icon: <AnthropicMark />,
     },
     {
-      title: "Open in T3 Chat",
+      title: "T3 Chat",
       href: `https://t3.chat/new?${new URLSearchParams({ q, search: "true" })}`,
       icon: <MessageSquare className="size-4" />,
     },
+    { title: "GitHub", href: githubUrl, icon: <GithubMark /> },
   ];
   return (
-    // Non-modal so opening doesn't lock body scroll / hide the scrollbar, which
-    // would widen the viewport and nudge the centered layout ~2px to the right.
-    <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm">
-          Open
-          <ChevronDown className="size-3.5" aria-hidden />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        sideOffset={8}
-        className="spectrum-border spectrum-border-on w-72 rounded-xl border-transparent bg-white/80 p-1.5 shadow-[0_16px_40px_-12px_rgba(21,21,21,0.28)] backdrop-blur-xl"
-      >
-        {items.map((item) => (
-          <DropdownMenuItem key={item.href} asChild>
-            <a
-              href={item.href}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="flex cursor-pointer items-start gap-2.5 rounded-lg focus:bg-black/[0.05] data-[highlighted]:bg-black/[0.05]"
-            >
-              <span className="mt-0.5 shrink-0 text-foreground">{item.icon}</span>
-              <span className="flex min-w-0 flex-col">
-                <span>{item.title}</span>
+    <TooltipProvider delayDuration={150}>
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-medium text-muted-foreground">Open in</span>
+        <div className="flex items-center gap-1.5">
+          {items.map((item) => (
+            <Tooltip key={item.href}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon-sm"
+                  asChild
+                  aria-label={`Open in ${item.title}`}
+                >
+                  <a href={item.href} target="_blank" rel="noreferrer noopener">
+                    {item.icon}
+                  </a>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-[16rem] text-center">
+                <span className="font-medium">Open in {item.title}</span>
                 {item.description && (
-                  <span className="text-xs font-normal text-muted-foreground">
-                    {item.description}
-                  </span>
+                  <span className="mt-0.5 block text-background/70">{item.description}</span>
                 )}
-              </span>
-              <ArrowUpRight
-                className="ms-auto size-3.5 shrink-0 text-muted-foreground"
-                aria-hidden
-              />
-            </a>
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+              </TooltipContent>
+            </Tooltip>
+          ))}
+        </div>
+      </div>
+    </TooltipProvider>
   );
 }
 
@@ -787,12 +776,12 @@ export function DocsGettingStarted() {
           <h1 className="max-w-[20ch] text-balance text-[clamp(2rem,3.2vw,2.75rem)] leading-[1.08]">
             Get started with Prisma
           </h1>
-          <div className="flex shrink-0 items-center gap-2">
-            <CopyMarkdown markdownUrl={`${D}/index.md`} />
-            <ViewOptions
+          <div className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2">
+            <OpenInTools
               markdownUrl={`${D}/index.md`}
               githubUrl="https://github.com/prisma/web/blob/main/apps/docs/content/docs/(index)/index.mdx"
             />
+            <CopyMarkdown markdownUrl={`${D}/index.md`} />
           </div>
         </div>
         <div className="mt-6 flex flex-col gap-8">
