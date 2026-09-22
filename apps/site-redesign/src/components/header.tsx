@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { ArrowRight, Menu } from "@/components/icons/forma"
 import { PLATFORM_PRODUCT_ICONS, PRODUCT_ICONS } from "@/components/product/icons"
@@ -30,6 +31,7 @@ const PLATFORM_ICONS = Object.fromEntries(
 export function Header() {
   const [open, setOpen] = useState(false)
   const [floating, setFloating] = useState(false)
+  const pathname = usePathname()
 
   useEffect(() => {
     const onScroll = () => setFloating(window.scrollY > 24)
@@ -37,6 +39,10 @@ export function Header() {
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
+
+  // /docs swaps the marketing header for the docs top-bar (see DocsTopBar), so
+  // the preview mirrors the real docs shell — search, Ask AI, social/auth.
+  if (pathname?.startsWith("/docs")) return null
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">

@@ -76,7 +76,7 @@ export function DocsSidebar() {
     <aside className="hidden lg:block">
       <nav
         aria-label="Documentation"
-        className="sticky top-28 max-h-[calc(100vh-9rem)] overflow-y-auto pb-10 pr-2 text-sm [scrollbar-width:thin]"
+        className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pb-10 pr-2 text-sm [scrollbar-width:thin]"
       >
         <ul className="flex flex-col gap-6">
           {GROUPS.map((group) => (
