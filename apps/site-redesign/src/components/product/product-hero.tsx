@@ -46,6 +46,7 @@ export function ProductHero({
   visual,
   placeholderLabel = "[Product abstraction]",
   benefitsPlacement = "below-cta",
+  visualAspect = true,
 }: Pick<ProductPageContent, "name" | "hero"> & {
   /**
    * A Platform product's canonical accent, or a raw `bg-*` class for pages
@@ -70,6 +71,11 @@ export function ProductHero({
    * (André, 2026-08-13); their copy is short enough to carry it.
    */
   benefitsPlacement?: "above-cta" | "below-cta";
+  /**
+   * Whether `visual` is boxed to 4:3 when stacked on mobile. Turn it off for a
+   * visual taller than that, so it keeps its own height instead of clipping.
+   */
+  visualAspect?: boolean;
 }) {
   const Illustration = hero.illustration ? PRODUCT_ILLUSTRATIONS[hero.illustration] : null;
   const dotColor = accent.startsWith("bg-")
@@ -193,7 +199,12 @@ export function ProductHero({
                     it would render a tour whose `% stops.length` is NaN, giving
                     an empty card with no tabs instead of falling through here */}
                 {visual ? (
-                  <div className="max-md:aspect-[4/3] md:flex md:h-full md:items-center">
+                  <div
+                    className={cn(
+                      "md:flex md:h-full md:items-center",
+                      visualAspect && "max-md:aspect-[4/3]",
+                    )}
+                  >
                     {visual}
                   </div>
                 ) : hero.tour?.length ? (

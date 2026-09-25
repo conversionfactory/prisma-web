@@ -10,6 +10,7 @@ import { Pattern } from "@/components/brand/pattern";
 import { Texture } from "@/components/brand/texture";
 import { Reveal } from "@/components/motion/reveal";
 import { RoleKicker } from "@/components/brand/role-kicker";
+import { cn } from "@/lib/utils";
 
 // Spectrum gradient matching the brand CTA glow (see prism-button.tsx).
 const SPECTRUM =
@@ -124,55 +125,75 @@ const HOME_CONTENT: StackBentoContent = {
   },
 };
 
+// The wrapped panel's backdrop: prismatic wash, the glass triangle, grain.
+function Backdrop() {
+  return (
+    <>
+      {/* prismatic backdrop — the hero's treatment with the wash spread
+          wider across the panel: broad spectral blooms along the bottom
+          edge, beam fan rising from below, dispersing to white above */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[44rem] overflow-hidden"
+      >
+        <div
+          className="absolute -bottom-1/3 left-1/2 h-[120%] w-[160%] -translate-x-1/2"
+          style={{
+            background: [
+              "radial-gradient(72% 58% at 14% 100%, color-mix(in srgb, var(--color-prism-cyan-400) 30%, transparent), transparent 72%)",
+              "radial-gradient(64% 52% at 50% 100%, color-mix(in srgb, var(--color-prism-yellow-300) 24%, transparent), transparent 70%)",
+              "radial-gradient(68% 54% at 88% 100%, color-mix(in srgb, var(--color-prism-red-400) 26%, transparent), transparent 72%)",
+            ].join(","),
+          }}
+        />
+        <div className="absolute bottom-[-24rem] left-[6%] h-[60rem] w-56 origin-bottom rotate-[-28deg] bg-prism-cyan-300/50 blur-[96px]" />
+        <div className="absolute bottom-[-26rem] left-1/2 h-[62rem] w-64 origin-bottom -translate-x-1/2 rotate-[5deg] bg-prism-yellow-200/60 blur-[104px]" />
+        <div className="absolute bottom-[-28rem] right-[4%] h-[60rem] w-56 origin-bottom rotate-[28deg] bg-prism-red-300/50 blur-[96px]" />
+        <div className="absolute inset-x-0 top-0 h-80 bg-gradient-to-t from-transparent via-white/60 to-white" />
+      </div>
+      {/* the glass triangle — the classic prism — rising out of the corner
+          where the spectrum concentrates behind it */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div
+          className="absolute bottom-[-14rem] right-[-10rem] h-[34rem] w-[52rem] rounded-full opacity-30 blur-[90px]"
+          style={{ backgroundImage: SPECTRUM }}
+        />
+        <GlassPrismSpin
+          shape="triangle"
+          tint="ink"
+          className="bottom-[-2rem] left-[-9rem] w-[34rem] max-md:bottom-[-1rem] max-md:left-[-6rem] max-md:w-[18rem]"
+        />
+      </div>
+      <Texture opacity={0.06} blend="multiply" />
+    </>
+  );
+}
+
 // Icon tile for the cross-stack tools: a white tile with a soft prismatic
 // bloom behind the glyph — light dispersing through frosted glass.
 // The TypeScript stack as a bento: three products as three-steps-style cards
 // (wash illustration + content), joined by the files that integrate them,
 // closed by the cross-stack tools. Wrapped panel with the hero's prismatic
-// backdrop and grain.
-export function StackBento({ content = HOME_CONTENT }: { content?: StackBentoContent } = {}) {
+// backdrop and grain — or, with `wrapped={false}`, plain white for pages where
+// it follows a wrapped hero directly.
+export function StackBento({
+  content = HOME_CONTENT,
+  wrapped = true,
+}: { content?: StackBentoContent; wrapped?: boolean } = {}) {
   const c = content;
   return (
-    <section className="bg-white px-3 py-3 sm:px-4">
-      <div className="relative mx-auto max-w-[96rem] overflow-hidden rounded-[1.5rem] border border-black/[0.06] bg-white">
-        {/* prismatic backdrop — the hero's treatment with the wash spread
-            wider across the panel: broad spectral blooms along the bottom
-            edge, beam fan rising from below, dispersing to white above */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-[44rem] overflow-hidden"
-        >
-          <div
-            className="absolute -bottom-1/3 left-1/2 h-[120%] w-[160%] -translate-x-1/2"
-            style={{
-              background: [
-                "radial-gradient(72% 58% at 14% 100%, color-mix(in srgb, var(--color-prism-cyan-400) 30%, transparent), transparent 72%)",
-                "radial-gradient(64% 52% at 50% 100%, color-mix(in srgb, var(--color-prism-yellow-300) 24%, transparent), transparent 70%)",
-                "radial-gradient(68% 54% at 88% 100%, color-mix(in srgb, var(--color-prism-red-400) 26%, transparent), transparent 72%)",
-              ].join(","),
-            }}
-          />
-          <div className="absolute bottom-[-24rem] left-[6%] h-[60rem] w-56 origin-bottom rotate-[-28deg] bg-prism-cyan-300/50 blur-[96px]" />
-          <div className="absolute bottom-[-26rem] left-1/2 h-[62rem] w-64 origin-bottom -translate-x-1/2 rotate-[5deg] bg-prism-yellow-200/60 blur-[104px]" />
-          <div className="absolute bottom-[-28rem] right-[4%] h-[60rem] w-56 origin-bottom rotate-[28deg] bg-prism-red-300/50 blur-[96px]" />
-          <div className="absolute inset-x-0 top-0 h-80 bg-gradient-to-t from-transparent via-white/60 to-white" />
-        </div>
-        {/* the glass triangle — the classic prism — rising out of the corner
-            where the spectrum concentrates behind it */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div
-            className="absolute bottom-[-14rem] right-[-10rem] h-[34rem] w-[52rem] rounded-full opacity-30 blur-[90px]"
-            style={{ backgroundImage: SPECTRUM }}
-          />
-          <GlassPrismSpin
-            shape="triangle"
-            tint="ink"
-            className="bottom-[-2rem] left-[-9rem] w-[34rem] max-md:bottom-[-1rem] max-md:left-[-6rem] max-md:w-[18rem]"
-          />
-        </div>
-        <Texture opacity={0.06} blend="multiply" />
+    <section className={cn("bg-white", wrapped && "px-3 py-3 sm:px-4")}>
+      <div
+        className={cn(
+          "relative mx-auto max-w-[96rem]",
+          wrapped && "overflow-hidden rounded-[1.5rem] border border-black/[0.06] bg-white",
+        )}
+      >
+        {wrapped ? <Backdrop /> : null}
 
-        <div className="relative px-4 py-20 sm:px-8 sm:py-24">
+        <div
+          className={cn("relative px-4 sm:px-8", wrapped ? "py-20 sm:py-24" : "py-24 sm:py-32")}
+        >
           <Reveal className="mx-auto flex max-w-3xl flex-col items-start text-left md:items-center md:text-center">
             <h2 className="max-w-[24ch] text-balance text-[clamp(2.125rem,3.5vw,3rem)] leading-[1.1]">
               The TypeScript stack, integrated by design

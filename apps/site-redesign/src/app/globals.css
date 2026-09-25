@@ -397,6 +397,19 @@
     }
   }
 
+  /* Light running down a vertical connector, then a beat of rest — the
+     vertical twin of line-shimmer. */
+  --animate-spine-flow: spine-flow 2.4s ease-in-out infinite;
+  @keyframes spine-flow {
+    0% {
+      transform: translateY(-100%);
+    }
+    55%,
+    100% {
+      transform: translateY(100%);
+    }
+  }
+
   /* Compute ray — the brand ray masking in from top to bottom, holding, then
      fading out before it re-reveals (the mask reset happens while invisible,
      so there's no jump). Rotated ~74deg, so "to right" along its length reads
