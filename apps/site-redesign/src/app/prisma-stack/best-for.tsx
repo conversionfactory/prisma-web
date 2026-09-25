@@ -17,7 +17,13 @@ export type BestForContent = {
   headline: string;
   intro: string;
   /** `image` is a path under /public — a transparent Prismo cut-out, fitted to the frame. */
-  items: { title: string; body: string; image?: string }[];
+  items: {
+    title: string;
+    body: string;
+    image?: string;
+    /** Zoom past the cut-out's transparent padding. Defaults to 1.2. */
+    imageScale?: number;
+  }[];
 };
 
 // "Who the Prisma Stack is best for" — a split list rather than another card
@@ -40,7 +46,7 @@ export function BestFor({ bestFor }: { bestFor: BestForContent }) {
         </div>
 
         <div role="list" className="border-b border-black/[0.08]">
-          {bestFor.items.map(({ title, body, image }, i) => {
+          {bestFor.items.map(({ title, body, image, imageScale = 1.2 }, i) => {
             const hue = HUES[i % HUES.length];
             return (
               <Reveal key={title} delay={i * 0.06}>
@@ -60,7 +66,8 @@ export function BestFor({ bestFor }: { bestFor: BestForContent }) {
                         alt=""
                         fill
                         sizes="(min-width: 640px) 13rem, 6.5rem"
-                        className="scale-[1.2] object-contain"
+                        className="object-contain"
+                        style={{ transform: `scale(${imageScale})` }}
                       />
                     ) : (
                       <span className="absolute inset-2 flex items-center justify-center rounded-lg border border-dashed border-black/15 text-center text-[0.5625rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground sm:text-[0.6875rem]">

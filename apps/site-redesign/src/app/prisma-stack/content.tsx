@@ -155,6 +155,8 @@ export const bestFor: BestForContent = {
     {
       title: "Startups",
       image: "/brand/prismo-startups.webp",
+      // the rocket and its trail run nearly edge to edge in the source
+      imageScale: 1,
       body: "Move fast with a small team on a stack that carries the product from first launch into production.",
     },
     {
