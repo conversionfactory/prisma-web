@@ -228,27 +228,30 @@ function AgentPrompt({
     <div className="my-3 rounded-xl border border-black/[0.06] bg-card">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 p-3">
         <Tile icon={icon} />
-        <span className="grow text-sm font-medium text-foreground">{title}</span>
-        <a
-          href={guideHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground"
-        >
-          <span className="spectrum-link">{guideTitle}</span>
-          <ArrowRight className="size-3.5" aria-hidden />
-        </a>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setOpen(true)}
-          aria-haspopup="dialog"
-          aria-expanded={open}
-        >
-          <ChevronDown className="size-3.5" aria-hidden />
-          View
-        </Button>
-        {copyBtn}
+        <span className="min-w-48 flex-1 text-sm font-medium text-foreground">{title}</span>
+        {/* One group so the actions wrap together and stay right-aligned. */}
+        <div className="ms-auto flex shrink-0 items-center gap-3">
+          <a
+            href={guideHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground"
+          >
+            <span className="spectrum-link">{guideTitle}</span>
+            <ArrowRight className="size-3.5" aria-hidden />
+          </a>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setOpen(true)}
+            aria-haspopup="dialog"
+            aria-expanded={open}
+          >
+            <ChevronDown className="size-3.5" aria-hidden />
+            View
+          </Button>
+          {copyBtn}
+        </div>
       </div>
       <Modal open={open} onClose={() => setOpen(false)} title={title} action={copyBtn}>
         <pre className="w-full whitespace-pre-wrap rounded-lg border border-black/[0.06] bg-muted/50 p-4 font-mono text-[0.8rem] leading-6 text-foreground">
