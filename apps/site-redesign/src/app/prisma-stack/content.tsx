@@ -1,4 +1,5 @@
 import type { StackBentoContent } from "@/components/sections/stack-bento";
+import type { BestForContent } from "./best-for";
 import type { ComparisonContent } from "@/components/use-case/segment/comparison-table";
 import type { SegmentUseCaseContent } from "@/components/use-case/segment/types";
 
@@ -139,28 +140,26 @@ export const when: SegmentUseCaseContent["when"] = {
   ],
 };
 
-export const bestFor: SegmentUseCaseContent["builds"] = {
+// Each audience gets a Prismo image (to be generated). Until `image` is set the
+// row shows a reserved slot. Images sit in a 4:3 frame, cropped to fill.
+export const bestFor: BestForContent = {
   headline: "Who the Prisma Stack is best for",
   intro:
     "Prisma fits TypeScript teams of any size that want one connected backend workflow, whether a person or an agent is driving it.",
   items: [
     {
-      icon: "code",
       title: "Solo founders and small teams",
       body: "Ship a real product without a database or ops hire, and keep building on the same stack as you grow.",
     },
     {
-      icon: "rocket",
       title: "Startups",
       body: "Move fast with a small team on a stack that carries the product from first launch into production.",
     },
     {
-      icon: "layoutGrid",
       title: "SaaS teams",
       body: "Keep your app, database, migrations, previews, and pricing connected as your product grows.",
     },
     {
-      icon: "gitBranch",
       title: "Larger engineering teams",
       body: "Give every engineer one shared backend workflow from schema to production.",
     },
