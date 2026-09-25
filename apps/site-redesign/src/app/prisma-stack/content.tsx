@@ -140,8 +140,8 @@ export const when: SegmentUseCaseContent["when"] = {
   ],
 };
 
-// Each audience gets a Prismo image (to be generated). Until `image` is set the
-// row shows a reserved slot. Images sit in a 4:3 frame, cropped to fill.
+// Each audience gets a Prismo image — transparent cut-outs, fitted inside the
+// tinted frame. An item without `image` shows a reserved slot.
 export const bestFor: BestForContent = {
   headline: "Who the Prisma Stack is best for",
   intro:
@@ -149,18 +149,22 @@ export const bestFor: BestForContent = {
   items: [
     {
       title: "Solo founders and small teams",
+      image: "/brand/prismo-solo-founders.webp",
       body: "Ship a real product without a database or ops hire, and keep building on the same stack as you grow.",
     },
     {
       title: "Startups",
+      image: "/brand/prismo-startups.webp",
       body: "Move fast with a small team on a stack that carries the product from first launch into production.",
     },
     {
       title: "SaaS teams",
+      image: "/brand/prismo-saas-teams.webp",
       body: "Keep your app, database, migrations, previews, and pricing connected as your product grows.",
     },
     {
       title: "Larger engineering teams",
+      image: "/brand/prismo-engineering-teams.webp",
       body: "Give every engineer one shared backend workflow from schema to production.",
     },
   ],

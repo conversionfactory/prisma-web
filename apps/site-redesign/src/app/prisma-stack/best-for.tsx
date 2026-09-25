@@ -16,7 +16,7 @@ const HUES = [
 export type BestForContent = {
   headline: string;
   intro: string;
-  /** `image` is a path under /public — a Prismo image, 4:3, cropped to fill. */
+  /** `image` is a path under /public — a transparent Prismo cut-out, fitted to the frame. */
   items: { title: string; body: string; image?: string }[];
 };
 
@@ -60,7 +60,7 @@ export function BestFor({ bestFor }: { bestFor: BestForContent }) {
                         alt=""
                         fill
                         sizes="(min-width: 640px) 13rem, 6.5rem"
-                        className="object-cover"
+                        className="scale-[1.2] object-contain"
                       />
                     ) : (
                       <span className="absolute inset-2 flex items-center justify-center rounded-lg border border-dashed border-black/15 text-center text-[0.5625rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground sm:text-[0.6875rem]">
