@@ -14,10 +14,10 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
     <div className="relative min-h-screen bg-muted">
       <Texture opacity={0.06} blend="multiply" />
       <DocsTopBar />
-      <div className="relative mx-auto max-w-[90rem] px-3 pb-16 pt-8 sm:px-5 lg:px-6">
+      <div className="relative mx-auto max-w-[90rem] px-3 pb-16 pt-4 sm:px-5 sm:pt-8 lg:px-6">
         <div className="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-8">
           <DocsSidebar />
-          <main className="relative overflow-hidden rounded-2xl border border-black/[0.06] bg-white px-6 py-10 shadow-[0_1px_2px_rgba(21,21,21,0.04),0_30px_60px_-40px_rgba(21,21,21,0.28)] sm:px-10 sm:py-12 lg:px-14">
+          <main className="relative overflow-hidden rounded-2xl border border-black/[0.06] bg-white px-4 py-8 shadow-[0_1px_2px_rgba(21,21,21,0.04),0_30px_60px_-40px_rgba(21,21,21,0.28)] sm:px-10 sm:py-12 lg:px-14">
             {children}
           </main>
         </div>

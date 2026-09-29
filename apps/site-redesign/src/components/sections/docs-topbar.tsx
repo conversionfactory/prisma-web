@@ -1,11 +1,13 @@
 "use client";
 
-import { MessagesSquare, Monitor, Moon, Sun } from "lucide-react";
+import { MessagesSquare, Monitor, Moon, PanelLeft, Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Discord, Github, Search } from "@/components/icons/forma";
+import { DocsNavList } from "@/components/sections/docs-sidebar";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { siteConfig } from "@/lib/config";
 import { cn } from "@/lib/utils";
 
@@ -146,6 +148,50 @@ export function DocsTopBar() {
           >
             <Search className="size-[1.05rem]" />
           </button>
+
+          {/* Below lg the docs sidebar moves into a drawer, as on the live docs. */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <button
+                type="button"
+                aria-label="Open Sidebar"
+                className="inline-flex size-8 items-center justify-center rounded-full text-foreground/80 transition-colors hover:text-foreground lg:hidden"
+              >
+                <PanelLeft className="size-[1.05rem]" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] overflow-y-auto" aria-describedby={undefined}>
+              <SheetTitle className="sr-only">Documentation</SheetTitle>
+              <nav aria-label="Documentation" className="mt-12 px-3 pb-8 text-sm">
+                <DocsNavList />
+              </nav>
+              <div className="mx-5 mb-8 flex items-center gap-2 border-t border-black/[0.06] pt-5 md:hidden">
+                <a
+                  href="https://pris.ly/github?utm_source=docs&utm_medium=navbar"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="GitHub"
+                  className="inline-flex size-8 items-center justify-center rounded-full text-foreground/80 transition-colors hover:text-foreground"
+                >
+                  <Github className="size-[1.15rem]" />
+                </a>
+                <a
+                  href="https://pris.ly/discord?utm_source=docs&utm_medium=navbar"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Join Discord"
+                  className="inline-flex size-8 items-center justify-center rounded-full text-foreground/80 transition-colors hover:text-foreground"
+                >
+                  <Discord className="size-[1.15rem]" />
+                </a>
+                <Button size="sm" asChild className="ms-auto">
+                  <a href="https://console.prisma.io/login?utm_source=docs&utm_medium=login">
+                    Login
+                  </a>
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>

@@ -214,8 +214,8 @@ function AgentPrompt({
 }) {
   const [open, setOpen] = useState(false);
   const [checked, copy] = useCopy();
-  const copyBtn = (
-    <Button size="sm" onClick={() => copy(prompt)}>
+  const copyBtn = (className?: string) => (
+    <Button size="sm" onClick={() => copy(prompt)} className={className}>
       {checked ? (
         <Check className="size-3.5" aria-hidden />
       ) : (
@@ -229,13 +229,15 @@ function AgentPrompt({
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 p-3">
         <Tile icon={icon} />
         <span className="min-w-48 flex-1 text-sm font-medium text-foreground">{title}</span>
-        {/* One group so the actions wrap together and stay right-aligned. */}
-        <div className="ms-auto flex shrink-0 items-center gap-3">
+        {/* One group so the actions wrap together and stay right-aligned. On
+            phones the guide link takes its own line and the two buttons split
+            the row below it, so nothing overflows the dialog. */}
+        <div className="flex w-full flex-wrap items-center gap-x-3 gap-y-2.5 sm:ms-auto sm:w-auto sm:flex-nowrap">
           <a
             href={guideHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground"
+            className="inline-flex basis-full items-center gap-1.5 text-sm font-medium text-foreground sm:basis-auto"
           >
             <span className="spectrum-link">{guideTitle}</span>
             <ArrowRight className="size-3.5" aria-hidden />
@@ -246,14 +248,15 @@ function AgentPrompt({
             onClick={() => setOpen(true)}
             aria-haspopup="dialog"
             aria-expanded={open}
+            className="flex-1 sm:flex-none"
           >
             <ChevronDown className="size-3.5" aria-hidden />
             View
           </Button>
-          {copyBtn}
+          {copyBtn("flex-1 sm:flex-none")}
         </div>
       </div>
-      <Modal open={open} onClose={() => setOpen(false)} title={title} action={copyBtn}>
+      <Modal open={open} onClose={() => setOpen(false)} title={title} action={copyBtn()}>
         <pre className="w-full whitespace-pre-wrap rounded-lg border border-black/[0.06] bg-muted/50 p-4 font-mono text-[0.8rem] leading-6 text-foreground">
           {prompt}
         </pre>
@@ -385,7 +388,7 @@ function OtherSetups() {
     <div className="my-2 rounded-xl border border-black/[0.06] bg-card">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 p-3">
         <Tile icon={<FolderPlus />} />
-        <span className="min-w-0 grow">
+        <span className="min-w-0 flex-1 basis-0">
           <span className="block text-sm font-medium text-foreground">
             Existing project, your own database, or a single product on its own
           </span>
@@ -394,16 +397,18 @@ function OtherSetups() {
             Postgres, or Compute alone.
           </span>
         </span>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setOpen(true)}
-          aria-haspopup="dialog"
-          aria-expanded={open}
-        >
-          <ChevronDown className="size-3.5" aria-hidden />
-          View
-        </Button>
+        <div className="basis-full ps-13 sm:basis-auto sm:ps-0">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setOpen(true)}
+            aria-haspopup="dialog"
+            aria-expanded={open}
+          >
+            <ChevronDown className="size-3.5" aria-hidden />
+            View
+          </Button>
+        </div>
       </div>
       <Modal open={open} onClose={() => setOpen(false)} title="Other setup paths">
         {DOCS_SETUPS.map((setup, i) => {
@@ -466,7 +471,7 @@ function SectionRow({
   const id = slug(title);
   const accent = SECTION_ACCENTS[index % SECTION_ACCENTS.length];
   return (
-    <section className="relative isolate overflow-hidden rounded-2xl border border-black/[0.06] bg-gradient-to-br from-prism-cyan-50/50 via-card to-card p-6 sm:p-8">
+    <section className="relative isolate overflow-hidden rounded-2xl border border-black/[0.06] bg-gradient-to-br from-prism-cyan-50/50 via-card to-card p-4 sm:p-8">
       <div
         aria-hidden
         className="pointer-events-none absolute -right-16 -top-16 -z-10 size-56 rounded-full opacity-[0.13] blur-[46px]"
@@ -487,9 +492,24 @@ function SectionRow({
   );
 }
 
-function IconGrid({ columns = 2, children }: { columns?: 2 | 3; children: ReactNode }) {
+function IconGrid({
+  columns = 2,
+  dense,
+  children,
+}: {
+  columns?: 2 | 3;
+  // Title-only tiles: two-up on phones instead of one long column.
+  dense?: boolean;
+  children: ReactNode;
+}) {
   return (
-    <div className={cn("grid grid-cols-1 gap-4 sm:grid-cols-2", columns === 3 && "lg:grid-cols-3")}>
+    <div
+      className={cn(
+        "grid gap-4 sm:grid-cols-2",
+        dense ? "grid-cols-2 gap-3 sm:gap-4" : "grid-cols-1",
+        columns === 3 && "lg:grid-cols-3",
+      )}
+    >
       {children}
     </div>
   );
@@ -566,7 +586,7 @@ function WorkflowLink({ href, title, badge, icon, description }: LinkTile) {
       </span>
       <span
         aria-hidden
-        className="inline-flex shrink-0 items-center gap-1 self-center text-xs font-medium text-muted-foreground transition-colors group-hover:text-foreground"
+        className="hidden shrink-0 items-center gap-1 self-center text-xs font-medium text-muted-foreground transition-colors group-hover:text-foreground sm:inline-flex"
       >
         docs
         <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
@@ -585,7 +605,7 @@ function WorkflowStage({
   links: LinkTile[];
 }) {
   return (
-    <section className="relative isolate flex flex-col rounded-2xl border border-black/[0.06] bg-gradient-to-br from-prism-cyan-50/60 via-card to-card p-5 sm:p-6">
+    <section className="relative isolate flex flex-col rounded-2xl border border-black/[0.06] bg-gradient-to-br from-prism-cyan-50/60 via-card to-card p-4 sm:p-6">
       <div
         aria-hidden
         className="pointer-events-none absolute -inset-px -z-10 rounded-2xl opacity-20 blur-[18px]"
@@ -779,7 +799,7 @@ export function DocsGettingStarted() {
           <h1 className="max-w-[20ch] text-balance text-[clamp(2rem,3.2vw,2.75rem)] leading-[1.08]">
             Get started with Prisma
           </h1>
-          <div className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <OpenInTools
               markdownUrl={`${D}/index.md`}
               githubUrl="https://github.com/prisma/web/blob/main/apps/docs/content/docs/(index)/index.mdx"
@@ -829,15 +849,17 @@ export function DocsGettingStarted() {
           {/* CLI callout */}
           <aside className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-black/[0.06] bg-card px-4 py-3.5 shadow-[0_1px_2px_rgba(21,21,21,0.04)]">
             <Tile icon={<Terminal />} />
-            <span className="min-w-0 grow text-sm leading-6 text-foreground/80">
+            <span className="min-w-0 flex-1 basis-0 text-sm leading-6 text-foreground/80">
               <InlineCode text="One CLI serves the whole stack: `npx prisma@latest` drives the ORM and the Prisma platform, from migrations and local dev to deploys, databases, and buckets, for you and your coding agent." />
             </span>
-            <Button variant="outline" size="sm" asChild>
-              <a href={`${D}/cli`} target="_blank" rel="noopener noreferrer">
-                CLI reference
-                <ArrowRight className="size-3.5" aria-hidden />
-              </a>
-            </Button>
+            <div className="basis-full ps-14 sm:basis-auto sm:ps-0">
+              <Button variant="outline" size="sm" asChild>
+                <a href={`${D}/cli`} target="_blank" rel="noopener noreferrer">
+                  CLI reference
+                  <ArrowRight className="size-3.5" aria-hidden />
+                </a>
+              </Button>
+            </div>
           </aside>
         </div>
       </div>
@@ -850,7 +872,7 @@ export function DocsGettingStarted() {
           title="Pick your framework"
           description="Every guide runs the same journey with the same commands: scaffold, connect Prisma Postgres, run a real query, and deploy. SvelteKit and Deno don't deploy to Compute yet; their guides stop at a verified local run."
         >
-          <IconGrid columns={3}>
+          <IconGrid columns={3} dense>
             {FRAMEWORKS.map((f) => (
               <IconLink key={f.href} {...f} />
             ))}

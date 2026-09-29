@@ -69,8 +69,42 @@ const GROUPS: NavGroup[] = [
   },
 ];
 
-// The docs left navbar — a sticky column riding alongside the content card, as
-// on the live docs. Hidden below lg (the site header carries nav there).
+// The grouped docs links, shared by the desktop sidebar and the mobile drawer
+// in the docs top-bar.
+export function DocsNavList() {
+  return (
+    <ul className="flex flex-col gap-6">
+      {GROUPS.map((group) => (
+        <li key={group.label}>
+          <p className="mb-1.5 px-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground/70">
+            {group.label}
+          </p>
+          <ul className="flex flex-col">
+            {group.items.map((item) => {
+              const Icon = item.icon;
+              return (
+                <li key={item.label}>
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 font-medium text-foreground/75 transition-colors hover:bg-black/[0.04] hover:text-foreground"
+                  >
+                    {Icon && <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />}
+                    <span className="truncate">{item.label}</span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// The docs left navbar — a sticky column riding alongside the content, as
+// on the live docs. Below lg it moves into the top-bar's drawer.
 export function DocsSidebar() {
   return (
     <aside className="hidden lg:block">
@@ -78,33 +112,7 @@ export function DocsSidebar() {
         aria-label="Documentation"
         className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pb-10 pr-2 text-sm [scrollbar-width:thin]"
       >
-        <ul className="flex flex-col gap-6">
-          {GROUPS.map((group) => (
-            <li key={group.label}>
-              <p className="mb-1.5 px-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground/70">
-                {group.label}
-              </p>
-              <ul className="flex flex-col">
-                {group.items.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <li key={item.label}>
-                      <a
-                        href={item.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 font-medium text-foreground/75 transition-colors hover:bg-black/[0.04] hover:text-foreground"
-                      >
-                        {Icon && <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden />}
-                        <span className="truncate">{item.label}</span>
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
-            </li>
-          ))}
-        </ul>
+        <DocsNavList />
       </nav>
     </aside>
   );
