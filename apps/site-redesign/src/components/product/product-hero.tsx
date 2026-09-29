@@ -136,7 +136,7 @@ export function ProductHero({
               so the gap under the navbar matches the wrapper's bottom */}
           {/* the demo takes the larger half — the copy column is short enough
               now that an even split left it stranded beside a tall panel */}
-          <div className="mx-auto grid max-w-site items-center gap-12 pb-20 pt-36 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] md:pb-28 md:pt-48 lg:gap-16">
+          <div className="mx-auto grid max-w-site grid-cols-1 items-center gap-12 pb-20 pt-36 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] md:pb-28 md:pt-48 lg:gap-16">
             {/* copy */}
             <div className="flex flex-col items-start">
               {/* the site's standard tagline: sentence case, ink at 70%, colour

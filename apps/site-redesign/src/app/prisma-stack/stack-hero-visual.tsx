@@ -74,16 +74,18 @@ function RailCaption({
   return (
     <Step
       on={on}
-      className="flex items-center gap-3 py-4 pl-[calc(2.25rem+1px)] sm:py-5 sm:pl-[calc(2.75rem+1px)]"
+      className="flex items-start gap-3 py-4 pl-[calc(2.25rem+1px)] sm:items-center sm:py-5 sm:pl-[calc(2.75rem+1px)]"
     >
       <span
         aria-hidden
         className={cn(
-          "relative z-10 size-2 shrink-0 rounded-full ring-4 ring-white transition-colors duration-500",
+          "relative z-10 mt-[0.125rem] size-2 shrink-0 rounded-full ring-4 ring-white transition-colors duration-500 sm:mt-0",
           on ? dot : "bg-border",
         )}
       />
-      <span className={cn(MONO, "min-w-0 truncate text-muted-foreground")}>{children}</span>
+      <span className={cn(MONO, "min-w-0 leading-snug text-muted-foreground sm:truncate sm:leading-none")}>
+        {children}
+      </span>
     </Step>
   );
 }
@@ -171,7 +173,7 @@ export function StackHeroVisual() {
           </span>
           <div className="min-w-0 flex-1">
             <p className={cn(MONO, "text-prism-cyan-700")}>you → agent</p>
-            <p className="mt-2 truncate text-[0.9375rem] font-semibold text-foreground sm:text-base">
+            <p className="mt-2 text-pretty text-[0.9375rem] font-semibold leading-snug text-foreground sm:truncate sm:text-base">
               Add a paid plan to users and ship it.
             </p>
           </div>
@@ -201,7 +203,7 @@ export function StackHeroVisual() {
             </Marker>
           </div>
           <div
-            className={cn(MONO, "flex flex-col gap-3 whitespace-pre py-5 text-white/85 sm:text-xs")}
+            className={cn(MONO, "flex flex-col gap-3 whitespace-pre-wrap py-5 text-white/85 sm:text-xs")}
           >
             <p className="px-5">
               <Kw>model</Kw> User {"{"}
