@@ -1,147 +1,301 @@
-import { Fragment } from "react";
-import { Code, Console, Database, Server, Table } from "@/components/icons/forma";
-import { Bar, CardChrome, SectionLabel } from "@/components/product/illustrations/parts";
+"use client";
+
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { useReducedMotion } from "framer-motion";
+import { AgentRobot } from "@/components/brand/agent-robot";
+import { Marker } from "@/components/brand/marker";
+import { CheckBold } from "@/components/icons/forma";
+import { Bar } from "@/components/product/illustrations/parts";
 import { cn } from "@/lib/utils";
 
-// The /prisma-stack hero abstraction: the three products as one wired column,
-// each layer in its canonical hue, with the cross-stack tools on the tinted
-// track underneath. Every label is a term from the page's copy; supporting
-// detail collapses to skeleton lines, same idiom as the product-page panels.
-// One motion only: light running down the wires that join the layers.
+// The /prisma-stack hero abstraction, after the client's mock-up (2026-09-29):
+// the stack shown being driven by an agent. One prompt at the top, then the
+// agent's run down a spectrum rail — it edits the schema (Prisma ORM), one
+// deploy ships the migration (Prisma Postgres) and the app (Prisma Compute).
+//
+// The in-visual wording is the client's, from the mock-up. Brand changes from
+// it: light code panel with the site's syntax hues instead of a dark editor,
+// product colour carried by Marker dots rather than filled pills (pills belong
+// to buttons), and Prismo as the agent.
+//
+// One motion: the run plays step by step, holds on the finished state, then
+// replays. Under reduced motion it rests on the finished state.
 
-const LAYERS = [
-  {
-    kicker: "Type-safe data layer",
-    name: "Prisma ORM",
-    Icon: Code,
-    tile: "border-prism-cyan-200 bg-prism-cyan-50 text-prism-cyan-800",
-    detail: (
-      <div className="flex flex-col gap-1.5">
-        <span className="font-mono text-[0.625rem] text-foreground">schema.prisma</span>
-        <Bar className="w-20" />
-        <Bar className="w-14" />
-        <Bar className="w-16" />
-      </div>
-    ),
-  },
-  {
-    kicker: "Managed database",
-    name: "Prisma Postgres",
-    Icon: Database,
-    tile: "border-prism-yellow-200 bg-prism-yellow-50 text-prism-yellow-800",
-    detail: (
-      <div className="grid w-24 grid-cols-3 gap-x-2 gap-y-1.5">
-        {Array.from({ length: 9 }).map((_, i) => (
-          <Bar key={i} className={cn("w-full", i < 3 && "bg-foreground/20")} />
-        ))}
-      </div>
-    ),
-  },
-  {
-    kicker: "App hosting",
-    name: "Prisma Compute",
-    Icon: Server,
-    tile: "border-prism-red-200 bg-prism-red-50 text-prism-red-800",
-    detail: (
-      <div className="flex flex-col items-end gap-1.5">
-        <span className="font-mono text-[0.625rem] text-foreground">git push</span>
-        <span className="flex items-center gap-1.5">
-          <span className="size-1.5 animate-status-pulse rounded-full bg-prism-cyan-400 motion-reduce:animate-none" />
-          <Bar className="w-16" />
-        </span>
-      </div>
-    ),
-  },
-];
+// How long each phase holds, in ms. Phase i reveals everything at step <= i.
+const PHASES = [900, 1400, 1100, 1200, 450, 450, 450, 3800];
+const DONE = PHASES.length - 1;
 
-const TOOLS = [
-  { name: "Prisma Studio", Icon: Table },
-  { name: "CLI + Management API", Icon: Console, chip: "--json" },
-];
+const MONO = "font-mono text-[0.6875rem] leading-none";
 
-// The wire between two layers, centred under the icon tiles (row border + row
-// padding + half the size-10 tile), with light running down it.
-function Connector({ gradient, delay }: { gradient: string; delay: string }) {
+function Kw({ children }: { children: React.ReactNode }) {
+  return <span className="text-prism-cyan-600">{children}</span>;
+}
+function Type({ children }: { children: React.ReactNode }) {
+  return <span className="text-prism-yellow-600">{children}</span>;
+}
+function Attr({ children }: { children: React.ReactNode }) {
+  return <span className="text-prism-red-500">{children}</span>;
+}
+
+/** Text on the rail: lit once the run reaches it, faded before. */
+function Step({
+  on,
+  className,
+  children,
+}: {
+  on: boolean;
+  className?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <span
-      aria-hidden
+    <div
       className={cn(
-        "relative ml-9 block min-h-6 w-0.5 flex-1 overflow-hidden bg-gradient-to-b sm:ml-10",
-        gradient,
+        "transition-opacity duration-500 ease-out motion-reduce:transition-none",
+        on ? "opacity-100" : "opacity-35",
+        className,
       )}
     >
-      <span
-        className="absolute inset-0 animate-spine-flow bg-gradient-to-b from-transparent via-white to-transparent motion-reduce:hidden"
-        style={{ animationDelay: delay }}
-      />
-    </span>
+      {children}
+    </div>
   );
 }
 
+/** The agent's narration between panels, on the rail. */
+function RailCaption({
+  on,
+  dot,
+  children,
+}: {
+  on: boolean;
+  dot: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Step on={on} className="flex items-center gap-2.5 py-3 pl-[1.625rem] sm:pl-[1.875rem]">
+      <span
+        aria-hidden
+        className={cn(
+          "relative z-10 size-2 shrink-0 rounded-full ring-4 ring-white transition-colors duration-500",
+          on ? dot : "bg-border",
+        )}
+      />
+      <span className={cn(MONO, "min-w-0 truncate text-muted-foreground")}>{children}</span>
+    </Step>
+  );
+}
+
+// Panels stay opaque while they wait their turn — a white veil ghosts the
+// contents instead, so the hero's ray never shows through a half-lit card.
+function Panel({
+  on = true,
+  className,
+  children,
+}: {
+  on?: boolean;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-xl border border-border/80 bg-card shadow-[0_1px_2px_rgba(21,21,21,0.04),0_12px_24px_-12px_rgba(21,21,21,0.12)]",
+        className,
+      )}
+    >
+      {children}
+      <span
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute inset-0 bg-card transition-opacity duration-500 ease-out motion-reduce:transition-none",
+          on ? "opacity-0" : "opacity-65",
+        )}
+      />
+    </div>
+  );
+}
+
+const noopSubscribe = () => () => {};
+
+const CHECKS = ["app deployed", "migration add_plan", "stage: production"];
+
 export function StackHeroVisual() {
+  const reduce = useReducedMotion();
+  const [phase, setPhase] = useState(0);
+
+  // False during SSR and hydration, true after — so the first render is the
+  // same on server and client, and reduced motion only takes over once mounted.
+  const mounted = useSyncExternalStore(noopSubscribe, () => true, () => false);
+
+  useEffect(() => {
+    if (reduce) return;
+    const id = setTimeout(() => setPhase((p) => (p + 1) % PHASES.length), PHASES[phase]);
+    return () => clearTimeout(id);
+  }, [phase, reduce]);
+
+  const at = reduce && mounted ? DONE : phase;
+  const working = at < DONE;
+
   return (
     <figure
       role="img"
-      aria-label="Illustration of the Prisma Stack: Prisma ORM, Prisma Postgres and Prisma Compute wired together in one column, with Prisma Studio and the CLI + Management API working across all three"
-      className="pointer-events-none flex h-full w-full select-none flex-col overflow-hidden rounded-2xl border border-border bg-card text-left shadow-[0_1px_2px_rgba(21,21,21,0.04),0_8px_16px_-4px_rgba(21,21,21,0.06),0_32px_64px_-16px_rgba(21,21,21,0.14)]"
+      aria-label="Illustration of an agent driving the Prisma Stack: asked to add a paid plan to users and ship it, the agent edits schema.prisma in Prisma ORM, then one deploy ships the add_plan migration to Prisma Postgres and the app to production on Prisma Compute"
+      className="pointer-events-none flex h-full w-full select-none flex-col justify-center text-left"
     >
-      <CardChrome
-        file="The Prisma Stack"
-        right={
-          <span className="flex items-center gap-1.5 text-[0.625rem] font-semibold text-prism-cyan-700">
-            <span className="size-1.5 animate-status-pulse rounded-full bg-prism-cyan-400 motion-reduce:animate-none" />
-            connected
-          </span>
-        }
-      />
+      <div className="relative">
+        {/* the rail the agent's run travels down, from the ask to the last card */}
+        <span
+          aria-hidden
+          className="absolute bottom-12 left-[1.8125rem] top-8 w-0.5 rounded-full bg-gradient-to-b from-prism-cyan-300 via-prism-yellow-300 to-prism-red-300 sm:left-[2.0625rem]"
+        />
 
-      {/* the wires stretch, so the layers always span the card top to bottom
-          whatever height the copy column sets */}
-      <div className="flex flex-1 flex-col px-5 py-6 sm:px-6">
-        {LAYERS.map(({ kicker, name, Icon, tile, detail }, i) => (
-          <Fragment key={name}>
-            {i === 1 ? (
-              <Connector gradient="from-prism-cyan-400 to-prism-yellow-400" delay="0s" />
-            ) : null}
-            {i === 2 ? (
-              <Connector gradient="from-prism-yellow-400 to-prism-red-500" delay="1.2s" />
-            ) : null}
-            <div className="flex items-center gap-4 rounded-xl border border-border/80 bg-card p-4 shadow-[0_1px_2px_rgba(21,21,21,0.04)] sm:p-5">
+        {/* the ask */}
+        <Panel className="flex items-center gap-3 p-2.5 pr-3 sm:gap-4 sm:p-3 sm:pr-4">
+          <span className="relative flex size-10 shrink-0 items-end justify-center overflow-hidden rounded-lg border border-prism-cyan-200 bg-gradient-to-b from-white to-prism-cyan-50 sm:size-11">
+            <AgentRobot variant="nod" className="w-[118%] max-w-none translate-y-[8%]" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className={cn(MONO, "text-prism-cyan-700")}>you → agent</p>
+            <p className="mt-1.5 truncate text-[0.875rem] font-semibold text-foreground sm:text-[0.9375rem]">
+              Add a paid plan to users and ship it.
+            </p>
+          </div>
+          <Marker
+            color={cn(
+              working ? "bg-prism-cyan-400 animate-status-pulse" : "bg-prism-cyan-500",
+              "motion-reduce:animate-none",
+            )}
+            className="shrink-0 font-mono text-[0.625rem] font-medium max-sm:hidden"
+          >
+            agent working
+          </Marker>
+        </Panel>
+
+        <RailCaption on={at >= 1} dot="bg-prism-cyan-400">
+          agent · edits schema.prisma
+        </RailCaption>
+
+        {/* 1 · Prisma ORM — the schema change */}
+        <Panel on={at >= 1}>
+          <div className="flex items-center gap-2 border-b border-border/70 px-4 py-2.5">
+            <span className="size-2 rounded-full bg-border" />
+            <span className="size-2 rounded-full bg-border" />
+            <span className="ml-1.5 font-mono text-xs text-foreground">schema.prisma</span>
+            <Marker color="bg-prism-cyan-400" className="ml-auto">
+              1 · Prisma ORM
+            </Marker>
+          </div>
+          <div
+            className={cn(
+              MONO,
+              "flex flex-col gap-2.5 whitespace-pre py-4 text-foreground sm:text-xs",
+            )}
+          >
+            <p className="px-4">
+              <Kw>model</Kw> User {"{"}
+            </p>
+            <p className="pl-8 pr-4">
+              {"id "}
+              <Type>{"Int "}</Type>
+              <Attr>@id @default(autoincrement())</Attr>
+            </p>
+            <p className="pl-8 pr-4">
+              {"email "}
+              <Type>{"String "}</Type>
+              <Attr>@unique</Attr>
+            </p>
+            {/* the agent's one-line change, highlighted as a diff */}
+            <p
+              className={cn(
+                "relative -my-1 py-1 pl-8 pr-4 transition-[background-color,opacity] duration-500 motion-reduce:transition-none",
+                at >= 1 ? "bg-prism-cyan-50 opacity-100" : "opacity-0",
+              )}
+            >
+              <span aria-hidden className="absolute left-0 top-0 h-full w-0.5 bg-prism-cyan-400" />
+              <span className="absolute left-4 text-prism-cyan-600">+</span>
+              {"plan "}
+              <Type>{"String "}</Type>
+              <Attr>@default(&quot;free&quot;)</Attr>
+            </p>
+            <p className="px-4">{"}"}</p>
+          </div>
+        </Panel>
+
+        <RailCaption on={at >= 2} dot="bg-prism-yellow-400">
+          agent · npx prisma deploy · one step ships app + migration
+        </RailCaption>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          {/* 2 · Prisma Postgres — the migration landed */}
+          <Panel on={at >= 3} className="flex h-full flex-col p-4">
+            <Marker color="bg-prism-yellow-400" className="self-start">
+              2 · Prisma Postgres
+            </Marker>
+            <p className="mt-3 text-pretty text-[0.8125rem] font-semibold leading-snug text-foreground">
+              Migration <code className="font-mono font-medium">add_plan</code> shipped with the
+              deploy
+            </p>
+            <div
+              className={cn(
+                MONO,
+                "mt-3 grid grid-cols-[2rem_minmax(0,1fr)_3.5rem] overflow-hidden rounded-lg border border-border/80 [&>span]:px-2 [&>span]:py-2",
+              )}
+            >
+              {[
+                ["id", "email", "plan"],
+                ["1", "ada@…", "free"],
+                ["2", "lin@…", "free"],
+              ].map((row, r) =>
+                row.map((cell, c) => (
+                  <span
+                    key={`${r}-${c}`}
+                    className={cn(
+                      "truncate",
+                      r === 0
+                        ? "text-muted-foreground"
+                        : "border-t border-border/60 text-foreground",
+                      c === 2 && "transition-colors duration-500 motion-reduce:transition-none",
+                      c === 2 && (at >= 3 ? "bg-prism-yellow-50 text-prism-yellow-800" : ""),
+                    )}
+                  >
+                    {cell}
+                  </span>
+                )),
+              )}
+            </div>
+          </Panel>
+
+          {/* 3 · Prisma Compute — the app is live */}
+          <Panel on={at >= 4} className="flex h-full flex-col p-4">
+            <Marker color="bg-prism-red-500" className="self-start">
+              3 · Prisma Compute
+            </Marker>
+            <p className="mt-3 text-[0.8125rem] font-semibold leading-snug text-foreground">
+              App live in production
+            </p>
+            <ul className="mb-3.5 mt-3 flex flex-col gap-2">
+              {CHECKS.map((label, i) => (
+                <li key={label} className={cn(MONO, "flex items-center gap-2 text-foreground")}>
+                  <span className="truncate">{label}</span>
+                  <CheckBold
+                    className={cn(
+                      "ml-auto size-3 shrink-0 text-prism-cyan-500 transition-opacity duration-300 motion-reduce:transition-none",
+                      at >= 4 + i ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                </li>
+              ))}
+            </ul>
+            <div className="mt-auto flex items-center gap-2 rounded-lg border border-border/80 bg-muted/40 px-2.5 py-2">
               <span
                 className={cn(
-                  "flex size-10 shrink-0 items-center justify-center rounded-lg border",
-                  tile,
+                  "size-1.5 shrink-0 rounded-full transition-colors duration-500",
+                  at >= DONE - 1 ? "bg-prism-cyan-400" : "bg-border",
                 )}
-              >
-                <Icon className="size-4" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <SectionLabel>{kicker}</SectionLabel>
-                <p className="mt-0.5 text-[0.9375rem] font-semibold text-foreground">{name}</p>
-              </div>
-              <div className="shrink-0 max-sm:hidden">{detail}</div>
+              />
+              <span className={cn(MONO, "text-muted-foreground")}>https://</span>
+              <Bar className="w-20" />
             </div>
-          </Fragment>
-        ))}
-      </div>
-
-      <div className="border-t border-border/70 bg-muted/40 px-5 py-4 sm:px-6">
-        <SectionLabel>Working across the stack</SectionLabel>
-        <div className="mt-2.5 flex flex-wrap gap-2">
-          {TOOLS.map(({ name, Icon, chip }) => (
-            <span
-              key={name}
-              className="flex items-center gap-2 rounded-lg border border-border/80 bg-card px-3 py-2"
-            >
-              <Icon className="size-3.5 text-foreground" />
-              <span className="text-[0.8125rem] font-semibold text-foreground">{name}</span>
-              {chip ? (
-                <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-[0.625rem] text-muted-foreground">
-                  {chip}
-                </code>
-              ) : null}
-            </span>
-          ))}
+          </Panel>
         </div>
       </div>
     </figure>
