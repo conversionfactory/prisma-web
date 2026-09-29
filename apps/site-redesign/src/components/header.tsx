@@ -42,7 +42,7 @@ export function Header() {
 
   // /docs swaps the marketing header for the docs top-bar (see DocsTopBar), so
   // the preview mirrors the real docs shell — search, Ask AI, social/auth.
-  if (pathname?.startsWith("/docs")) return null
+  if (pathname === "/docs" || pathname?.startsWith("/docs/")) return null
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
