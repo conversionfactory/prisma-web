@@ -2,11 +2,11 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { useReducedMotion } from "framer-motion";
-import { AgentRobot } from "@/components/brand/agent-robot";
 import { Marker } from "@/components/brand/marker";
 import { CheckBold } from "@/components/icons/forma";
 import { Bar } from "@/components/product/illustrations/parts";
 import { cn } from "@/lib/utils";
+import { ClaudeLogo, GeminiLogo, GrokLogo, OpenAILogo } from "./agent-logos";
 
 // The /prisma-stack hero abstraction, after the client's mock-up (2026-09-29):
 // the stack shown being driven by an agent. One prompt at the top, then the
@@ -16,7 +16,8 @@ import { cn } from "@/lib/utils";
 // The in-visual wording is the client's, from the mock-up. Brand changes from
 // it: the dark terminal kept, in the site's ink with the brand's syntax hues,
 // product colour carried by Marker dots rather than filled pills (pills belong
-// to buttons), and Prismo as the agent.
+// to buttons). The agent is whichever one you bring: the avatar rotates
+// through ChatGPT, Claude, Gemini and Grok (client ask, 2026-10-01).
 //
 // One motion: the run plays step by step, holds on the finished state, then
 // replays. Under reduced motion it rests on the finished state.
@@ -83,7 +84,12 @@ function RailCaption({
           on ? dot : "bg-border",
         )}
       />
-      <span className={cn(MONO, "min-w-0 leading-snug text-muted-foreground sm:truncate sm:leading-none")}>
+      <span
+        className={cn(
+          MONO,
+          "min-w-0 leading-snug text-muted-foreground sm:truncate sm:leading-none",
+        )}
+      >
         {children}
       </span>
     </Step>
@@ -129,11 +135,22 @@ function Panel({
 
 const noopSubscribe = () => () => {};
 
+// Bring your own agent: the ask's avatar rotates through the agents a
+// visitor might already use, independent of the run below.
+const AGENTS = [
+  { name: "ChatGPT", Logo: OpenAILogo },
+  { name: "Claude", Logo: ClaudeLogo },
+  { name: "Gemini", Logo: GeminiLogo },
+  { name: "Grok", Logo: GrokLogo },
+];
+const AGENT_HOLD = 2800;
+
 const CHECKS = ["app deployed", "migration add_plan", "stage: production"];
 
 export function StackHeroVisual() {
   const reduce = useReducedMotion();
   const [phase, setPhase] = useState(0);
+  const [agent, setAgent] = useState(0);
 
   // False during SSR and hydration, true after — so the first render is the
   // same on server and client, and reduced motion only takes over once mounted.
@@ -149,13 +166,19 @@ export function StackHeroVisual() {
     return () => clearTimeout(id);
   }, [phase, reduce]);
 
+  useEffect(() => {
+    if (reduce) return;
+    const id = setInterval(() => setAgent((a) => (a + 1) % AGENTS.length), AGENT_HOLD);
+    return () => clearInterval(id);
+  }, [reduce]);
+
   const at = reduce && mounted ? DONE : phase;
   const working = at < DONE;
 
   return (
     <figure
       role="img"
-      aria-label="Illustration of an agent driving the Prisma Stack: asked to add a paid plan to users and ship it, the agent edits schema.prisma in Prisma ORM, then one deploy ships the add_plan migration to Prisma Postgres and the app to production on Prisma Compute"
+      aria-label="Illustration of your own coding agent — ChatGPT, Claude, Gemini or Grok — driving the Prisma Stack: asked to add a paid plan to users and ship it, the agent edits schema.prisma in Prisma ORM, then one deploy ships the add_plan migration to Prisma Postgres and the app to production on Prisma Compute"
       className="pointer-events-none flex h-full w-full select-none flex-col justify-center text-left"
     >
       <div className="relative">
@@ -167,12 +190,37 @@ export function StackHeroVisual() {
 
         {/* the ask */}
         <Panel className="flex items-center gap-4 p-3 pr-4 sm:gap-5 sm:p-4 sm:pr-5">
-          {/* Prismo, the agent, with room around him on a soft cyan tile */}
-          <span className="relative flex size-14 shrink-0 items-center justify-center rounded-xl border border-prism-cyan-200 bg-gradient-to-b from-white to-prism-cyan-50 p-1 sm:size-16 sm:p-1.5">
-            <AgentRobot variant="nod" className="h-full w-full object-contain" />
+          {/* whichever agent you bring — the marks crossfade in one cell */}
+          <span className="relative grid size-14 shrink-0 place-items-center rounded-xl border border-border/80 bg-gradient-to-b from-white to-muted/50 shadow-[inset_0_1px_0_white] sm:size-16 [&>*]:col-start-1 [&>*]:row-start-1">
+            {AGENTS.map(({ name, Logo }, i) => (
+              <Logo
+                key={name}
+                className={cn(
+                  "size-7 text-primary transition-[opacity,transform,filter] duration-500 ease-out motion-reduce:transition-none sm:size-8",
+                  i === agent ? "scale-100 opacity-100 blur-0" : "scale-75 opacity-0 blur-[2px]",
+                )}
+              />
+            ))}
           </span>
           <div className="min-w-0 flex-1">
-            <p className={cn(MONO, "text-prism-cyan-700")}>you → agent</p>
+            <p className={cn(MONO, "flex items-center text-prism-cyan-700")}>
+              you →&nbsp;
+              {/* names share one grid cell, so the label never reflows */}
+              <span className="grid [&>*]:col-start-1 [&>*]:row-start-1">
+                {AGENTS.map(({ name }, i) => (
+                  <span
+                    key={name}
+                    aria-hidden={i !== agent}
+                    className={cn(
+                      "transition-opacity duration-500 motion-reduce:transition-none",
+                      i === agent ? "opacity-100" : "opacity-0",
+                    )}
+                  >
+                    {name}
+                  </span>
+                ))}
+              </span>
+            </p>
             <p className="mt-2 text-pretty text-[0.9375rem] font-semibold leading-snug text-foreground sm:truncate sm:text-base">
               Add a paid plan to users and ship it.
             </p>
@@ -203,7 +251,10 @@ export function StackHeroVisual() {
             </Marker>
           </div>
           <div
-            className={cn(MONO, "flex flex-col gap-3 whitespace-pre-wrap py-5 text-white/85 sm:text-xs")}
+            className={cn(
+              MONO,
+              "flex flex-col gap-3 whitespace-pre-wrap py-5 text-white/85 sm:text-xs",
+            )}
           >
             <p className="px-5">
               <Kw>model</Kw> User {"{"}
