@@ -48,13 +48,15 @@ export function ComparisonTable({ comparison }: { comparison: ComparisonContent 
         <Reveal>
           <h2 className={cn("max-w-[26ch]", HEADING)}>{headline}</h2>
         </Reveal>
-        <div className="mt-5 flex max-w-[70ch] flex-col gap-4">
-          {intro.map((para, i) => (
-            <Reveal key={i} delay={0.05 + i * 0.05}>
-              <p className="text-pretty leading-relaxed text-muted-foreground">{para}</p>
-            </Reveal>
-          ))}
-        </div>
+        {intro.length ? (
+          <div className="mt-5 flex max-w-[70ch] flex-col gap-4">
+            {intro.map((para, i) => (
+              <Reveal key={i} delay={0.05 + i * 0.05}>
+                <p className="text-pretty leading-relaxed text-muted-foreground">{para}</p>
+              </Reveal>
+            ))}
+          </div>
+        ) : null}
 
         <Reveal delay={0.15} className="relative mt-12">
           {/* the pricing table's prismatic halo — inner edge + soft bloom */}

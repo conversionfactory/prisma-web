@@ -19,8 +19,9 @@ import { ClaudeLogo, GeminiLogo, GrokLogo, OpenAILogo } from "./agent-logos";
 // to buttons). The agent is whichever one you bring: the avatar rotates
 // through ChatGPT, Claude, Gemini and Grok (client ask, 2026-10-01).
 //
-// One motion: the run plays step by step, holds on the finished state, then
-// replays. Under reduced motion it rests on the finished state.
+// Two motions: the run plays step by step, holds on the finished state, then
+// replays; the agent avatar rotates on its own timer. Under reduced motion the
+// run rests on the finished state and the avatar holds on the first agent.
 
 // How long each phase holds, in ms. Phase i reveals everything at step <= i.
 const PHASES = [900, 1400, 1100, 1200, 450, 450, 450, 3800];
