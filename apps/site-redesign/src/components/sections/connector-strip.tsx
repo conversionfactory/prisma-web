@@ -24,7 +24,7 @@ export function ConnectorStrip({
   gradient,
 }: {
   file: string
-  caption: string
+  caption?: string
   gradient: string
 }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -69,7 +69,7 @@ export function ConnectorStrip({
         </span>
         <FileChip>{file}</FileChip>
       </div>
-      <em className="text-sm text-muted-foreground">{caption}</em>
+      {caption ? <em className="text-sm text-muted-foreground">{caption}</em> : null}
       <span aria-hidden className="relative h-7 w-0.5 overflow-hidden rounded-full bg-border/70">
         <span
           data-fill
