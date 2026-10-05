@@ -45,7 +45,7 @@ import { cn } from "@/lib/utils";
 const D = "https://www.prisma.io/docs";
 
 /** Renders `backtick` spans in a plain string as inline code. */
-function InlineCode({ text }: { text: string }) {
+export function InlineCode({ text }: { text: string }) {
   return (
     <>
       {text.split(/`([^`]+)`/g).map((part, i) =>
@@ -64,7 +64,7 @@ function InlineCode({ text }: { text: string }) {
   );
 }
 
-function InlineLink({ href, children }: { href: string; children: ReactNode }) {
+export function InlineLink({ href, children }: { href: string; children: ReactNode }) {
   return (
     <a
       href={href}
@@ -140,7 +140,7 @@ function Tile({
 
 // ---- Interactive: copy-able agent prompts in a modal --------------------
 
-function useCopy() {
+export function useCopy() {
   const [checked, setChecked] = useState(false);
   const copy = async (text: string) => {
     try {
@@ -267,7 +267,7 @@ function AgentPrompt({
 
 // Copies the page's markdown. Fetches the .md content (falls back to copying the
 // URL if the cross-origin fetch is blocked), matching the live LLMCopyButton.
-function CopyMarkdown({ markdownUrl }: { markdownUrl: string }) {
+export function CopyMarkdown({ markdownUrl }: { markdownUrl: string }) {
   const [checked, setChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const onClick = async () => {
@@ -326,7 +326,7 @@ function AnthropicMark() {
 
 // Open the page's markdown in an LLM (or on GitHub). Exposed inline — one button
 // per tool — so it's immediately obvious the docs open in your favourite AI tool.
-function OpenInTools({ markdownUrl, githubUrl }: { markdownUrl: string; githubUrl: string }) {
+export function OpenInTools({ markdownUrl, githubUrl }: { markdownUrl: string; githubUrl: string }) {
   const q = `Read ${markdownUrl}, I want to ask questions about it.`;
   const items = [
     {
@@ -492,7 +492,7 @@ function SectionRow({
   );
 }
 
-function IconGrid({
+export function IconGrid({
   columns = 2,
   dense,
   children,
@@ -515,7 +515,7 @@ function IconGrid({
   );
 }
 
-type LinkTile = {
+export type LinkTile = {
   href: string;
   title: string;
   src?: string;
@@ -527,7 +527,7 @@ type LinkTile = {
   badge?: string;
 };
 
-function IconLink({
+export function IconLink({
   href,
   title,
   src,
@@ -538,11 +538,12 @@ function IconLink({
   description,
   badge,
 }: LinkTile) {
+  const external = href.startsWith("http");
   return (
     <a
       href={href}
-      target="_blank"
-      rel="noopener noreferrer"
+      target={external ? "_blank" : undefined}
+      rel={external ? "noopener noreferrer" : undefined}
       className={cn(
         "group flex gap-3 rounded-xl border border-black/[0.06] bg-card p-3 shadow-[0_1px_2px_rgba(21,21,21,0.04)] transition-[box-shadow,border-color] hover:border-black/10 hover:shadow-[0_1px_2px_rgba(21,21,21,0.04),0_14px_28px_-20px_rgba(21,21,21,0.25)]",
         description ? "items-start" : "items-center",
