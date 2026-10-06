@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { DocsArticle } from "@/components/sections/docs-article";
+import { DocsArticle, DocsArticleNav, DocsToc } from "@/components/sections/docs-article";
 import { DocsShell } from "@/components/sections/docs-shell";
+import { DocsSidebar } from "@/components/sections/docs-sidebar";
 import { DOCS_ARTICLES } from "@/data/docs-articles";
 
 type Props = { params: Promise<{ slug: string[] }> };
@@ -28,7 +29,14 @@ export default async function DocsArticlePage({ params }: Props) {
   if (!DOCS_ARTICLES[key]) notFound();
 
   return (
-    <DocsShell>
+    <DocsShell
+      sidebar={
+        <DocsSidebar>
+          <DocsArticleNav slug={key} />
+        </DocsSidebar>
+      }
+      toc={<DocsToc slug={key} />}
+    >
       <DocsArticle slug={key} />
     </DocsShell>
   );

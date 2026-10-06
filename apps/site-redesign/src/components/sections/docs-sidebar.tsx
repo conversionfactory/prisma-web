@@ -13,7 +13,7 @@ import {
   Terminal,
   Zap,
 } from "lucide-react";
-import type { ComponentType } from "react";
+import type { ComponentType, ReactNode } from "react";
 import { BucketIcon } from "@/components/icons/bucket";
 
 type IconType = ComponentType<{ className?: string }>;
@@ -104,15 +104,16 @@ export function DocsNavList() {
 }
 
 // The docs left navbar — a sticky column riding alongside the content, as
-// on the live docs. Below lg it moves into the top-bar's drawer.
-export function DocsSidebar() {
+// on the live docs. Below lg it moves into the top-bar's drawer. Article pages
+// pass their own section nav as children.
+export function DocsSidebar({ children = <DocsNavList /> }: { children?: ReactNode }) {
   return (
     <aside className="hidden lg:block">
       <nav
         aria-label="Documentation"
         className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pb-10 pr-2 text-sm [scrollbar-width:thin]"
       >
-        <DocsNavList />
+        {children}
       </nav>
     </aside>
   );

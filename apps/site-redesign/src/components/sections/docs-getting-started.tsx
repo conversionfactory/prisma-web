@@ -768,33 +768,46 @@ const BROWSE: LinkTile[] = [
   { href: `${D}/ai`, title: "AI tools", description: "Skills, MCP, and prompts", icon: <Bot /> },
 ];
 
+// The hero's prism light: cyan/yellow washes with a structural PrismRay,
+// faded in from the top. Sits behind a `relative isolate` hero. `fadeOut`
+// also fades it at the bottom, for short heroes where it would otherwise end
+// on a hard edge.
+export function DocsHeroLight({ className, fadeOut }: { className?: string; fadeOut?: boolean }) {
+  const mask = fadeOut
+    ? "linear-gradient(to bottom, transparent, #000 4rem, #000 calc(100% - 3rem), transparent)"
+    : "linear-gradient(to bottom, transparent, #000 5rem)";
+  return (
+    <div
+      aria-hidden
+      className={cn(
+        "pointer-events-none absolute -inset-x-10 top-16 -bottom-8 -z-10 overflow-hidden",
+        className,
+      )}
+      style={{ maskImage: mask, WebkitMaskImage: mask }}
+    >
+      <div
+        className="absolute inset-0"
+        style={{
+          background: [
+            "radial-gradient(38% 45% at 78% 16%, color-mix(in srgb, var(--color-prism-cyan-400) 20%, transparent), transparent 68%)",
+            "radial-gradient(30% 38% at 94% 55%, color-mix(in srgb, var(--color-prism-yellow-300) 15%, transparent), transparent 66%)",
+          ].join(","),
+        }}
+      />
+      <PrismRay
+        intensity="structural"
+        className="left-[24%] top-[52%] h-12 w-[90rem] -translate-y-1/2"
+      />
+    </div>
+  );
+}
+
 export function DocsGettingStarted() {
   return (
     <div>
       {/* Hero */}
       <div className="relative isolate pb-12">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -inset-x-10 top-16 -bottom-8 -z-10 overflow-hidden"
-          style={{
-            maskImage: "linear-gradient(to bottom, transparent, #000 5rem)",
-            WebkitMaskImage: "linear-gradient(to bottom, transparent, #000 5rem)",
-          }}
-        >
-          <div
-            className="absolute inset-0"
-            style={{
-              background: [
-                "radial-gradient(38% 45% at 78% 16%, color-mix(in srgb, var(--color-prism-cyan-400) 20%, transparent), transparent 68%)",
-                "radial-gradient(30% 38% at 94% 55%, color-mix(in srgb, var(--color-prism-yellow-300) 15%, transparent), transparent 66%)",
-              ].join(","),
-            }}
-          />
-          <PrismRay
-            intensity="structural"
-            className="left-[24%] top-[52%] h-12 w-[90rem] -translate-y-1/2"
-          />
-        </div>
+        <DocsHeroLight />
 
         <div className="flex flex-wrap items-start justify-between gap-4">
           <h1 className="max-w-[20ch] text-balance text-[clamp(2rem,3.2vw,2.75rem)] leading-[1.08]">
