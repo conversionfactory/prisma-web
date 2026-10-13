@@ -6,7 +6,6 @@ import { type CSSProperties, type ReactNode, useEffect, useState } from "react";
 import { highlight } from "sugar-high";
 import {
   CopyMarkdown,
-  DocsHeroLight,
   IconGrid,
   IconLink,
   InlineCode,
@@ -240,8 +239,7 @@ export function DocsArticle({ slug }: { slug: string }) {
   const headings = headingsOf(article);
   return (
     <article>
-      <header className="relative isolate border-b border-black/[0.06] pb-8">
-        <DocsHeroLight className="top-0 bottom-0" fadeOut />
+      <header className="border-b border-black/[0.06] pb-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <h1 className="max-w-[24ch] text-balance text-[clamp(2rem,3.2vw,2.75rem)] leading-[1.08]">
             {article.title}

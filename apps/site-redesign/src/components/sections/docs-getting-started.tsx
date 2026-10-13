@@ -769,21 +769,16 @@ const BROWSE: LinkTile[] = [
 ];
 
 // The hero's prism light: cyan/yellow washes with a structural PrismRay,
-// faded in from the top. Sits behind a `relative isolate` hero. `fadeOut`
-// also fades it at the bottom, for short heroes where it would otherwise end
-// on a hard edge.
-export function DocsHeroLight({ className, fadeOut }: { className?: string; fadeOut?: boolean }) {
-  const mask = fadeOut
-    ? "linear-gradient(to bottom, transparent, #000 4rem, #000 calc(100% - 3rem), transparent)"
-    : "linear-gradient(to bottom, transparent, #000 5rem)";
+// faded in from the top. Sits behind the `relative isolate` hero.
+function DocsHeroLight() {
   return (
     <div
       aria-hidden
-      className={cn(
-        "pointer-events-none absolute -inset-x-10 top-16 -bottom-8 -z-10 overflow-hidden",
-        className,
-      )}
-      style={{ maskImage: mask, WebkitMaskImage: mask }}
+      className="pointer-events-none absolute -inset-x-10 top-16 -bottom-8 -z-10 overflow-hidden"
+      style={{
+        maskImage: "linear-gradient(to bottom, transparent, #000 5rem)",
+        WebkitMaskImage: "linear-gradient(to bottom, transparent, #000 5rem)",
+      }}
     >
       <div
         className="absolute inset-0"
