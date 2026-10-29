@@ -170,6 +170,8 @@ type BurstProps = {
   /** render scale; the shader is soft, so half-res is indistinguishable */
   resolution?: number;
   colors?: string[];
+  /** ray jitter 0..1 (the site uses 0.8); 0 renders the light smooth, no grain */
+  noise?: number;
   style?: React.CSSProperties;
 };
 
@@ -183,6 +185,7 @@ export const PrismaticBurst: React.FC<BurstProps> = ({
   seed = 0,
   resolution = 0.5,
   colors = BURST_COLORS,
+  noise = 0.8,
   style,
 }) => {
   const frame = useCurrentFrame();
@@ -207,8 +210,9 @@ export const PrismaticBurst: React.FC<BurstProps> = ({
     gl.uniform1f(loc.uDistort, distort);
     gl.uniform2f(loc.uOffset, 0, 0);
     gl.uniform1i(loc.uRayCount, rayCount);
+    gl.uniform1f(loc.uNoiseAmount, noise);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
-  }, [frame, fps, w, h, intensity, speed, distort, rayCount, seed, colors]);
+  }, [frame, fps, w, h, intensity, speed, distort, rayCount, seed, colors, noise]);
 
   return <canvas ref={canvasRef} width={w} height={h} style={{ width, height, display: "block", ...style }} />;
 };

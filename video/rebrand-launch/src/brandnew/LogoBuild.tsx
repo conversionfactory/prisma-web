@@ -1,138 +1,153 @@
 import React from "react";
-import { AbsoluteFill, Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { Glint } from "../components/Glint";
-import { GLIDE, LEAVE, clamp, ease } from "../components/motion";
-import { Texture } from "../site/Surfaces";
+import { AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { GLIDE, RISE, clamp, ease } from "../components/motion";
 import { C } from "../theme";
 
 // The mark in its own 263x264 units (components/Marks.tsx).
 const BANDS = [
-  { d: "M57.3357 92.5003L0 149.939V53.5L53.2105 0.10425V0H149.524L57.3357 92.5003Z", fill: C.markCyan },
-  { d: "M263 91.7452L91.0537 264H0V172.229L171.92 0H263V91.7452Z", fill: C.markRed },
-  { d: "M209.686 264H113.373L156.453 220.773L263.001 114.034V210.5L209.686 264Z", fill: C.markYellow },
+  { d: "M57.3357 92.5003L0 149.939V53.5L53.2105 0.10425V0H149.524L57.3357 92.5003Z", fill: C.markCyan, a: 53.3, b: 149.9 },
+  { d: "M263 91.7452L91.0537 264H0V172.229L171.92 0H263V91.7452Z", fill: C.markRed, a: 172.2, b: 354.8 },
+  { d: "M209.686 264H113.373L156.453 220.773L263.001 114.034V210.5L209.686 264Z", fill: C.markYellow, a: 377.2, b: 473.9 },
 ];
-// Every edge of the mark that isn't the square sits on a 45deg line x + y = k:
-// the two chamfers and both sides of both gaps.
-const DIAGONALS = [53.3, 149.9, 172.2, 354.8, 377.2, 473.9];
+const SQUARE = "M0 0H263V264H0Z";
+const FAR = 900;
 
-export const LOGO_BUILD_FRAMES = 600;
+// The wordmark's letters, as horizontal spans of logo/full-color.svg (from
+// the Figma lockup's vectors), so each can arrive on its own.
+const LETTERS = [
+  [33.72, 44.54],
+  [46.21, 52.06],
+  [53.12, 56.79],
+  [57.93, 67.3],
+  [69.1, 86.52],
+  [88.32, 100],
+];
 
-// Logo build, 10s at 60fps on paper:
-// 0-1.5s   the square and its six 45deg construction lines draw in
-// 1.5-3s   the three bands trace along the lines
-// 3-4.5s   light sweeps the diagonal and floods each band with its colour
-// 4.5-6s   construction falls away, the mark settles, the wordmark slides out
-// 6-10s    lockup holds with a glint, then breathes out
+export const LOGO_BUILD_FRAMES = 480;
+
+// Logo build, 8s at 60fps on paper:
+// 0-1s      the square draws in, hairline
+// 0.6-2.4s  six 45deg beams shoot through it, each in the colour of the band
+//           it bounds, alternating direction, and lock in with a flash
+// 2.3-3.8s  each band grows out from its centre line to its two beams:
+//           light turning solid
+// 3.6-4.4s  the beams and the square burn off, the mark glides into the lockup
+// 5-6.2s    the letters rise into place one after another, each from behind
+//           its own baseline
+// 6.2-8s    holds
+const DRAW = [0, 60];
+const BEAMS = 36; // + 16 per beam, 22 long
+const FORM = 140; // + 22 per band, 52 long
+const BURN = [216, 262];
+const SETTLE = [252, 314];
+const LETTERS_IN = 300; // + 6 per letter, 38 long
+
 export const LogoBuild: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps, width, height } = useVideoConfig();
+  const { width, height } = useVideoConfig();
   const u = Math.min(width / 1920, height / 1080);
 
-  // Mark geometry on screen.
-  const big = 520 * u;
-  const k = big / 263;
-  const settle = ease(frame, 270, 330, [0, 1], GLIDE);
+  const big = 460 * u;
   const lockW = 1100 * u;
   const finalMark = lockW * (67 / 264);
+  const settle = ease(frame, SETTLE[0], SETTLE[1], [0, 1], GLIDE);
   const markSize = big + (finalMark - big) * settle;
   const markX = (width - big) / 2 + ((width - lockW) / 2 - (width - big) / 2) * settle;
   const markY = (height - big) / 2 + ((height - finalMark) / 2 - (height - big) / 2) * settle;
   const s = markSize / 263;
 
-  const grid = ease(frame, 0, 60, [0, 1]);
-  const lines = (i: number) => ease(frame, 10 + i * 7, 70 + i * 7, [0, 1], GLIDE);
-  const trace = (i: number) => ease(frame, 90 + i * 14, 170 + i * 14, [0, 1], GLIDE);
-  const flood = (i: number) => ease(frame, 190 + i * 12, 236 + i * 12, [0, 1]);
-  const sweep = ease(frame, 180, 250, [-0.4, 1.4]);
-  const construct = 1 - ease(frame, 250, 300, [0, 1]);
-  const word = ease(frame, 300, 350, [0, 1]);
-  const pop = spring({ frame: frame - 236, fps, config: { damping: 12, stiffness: 160 } });
-  const out = ease(frame, LOGO_BUILD_FRAMES - 30, LOGO_BUILD_FRAMES, [0, 1], LEAVE);
+  const square = ease(frame, DRAW[0], DRAW[1], [0, 1], GLIDE);
+  const burn = ease(frame, BURN[0], BURN[1], [0, 1], GLIDE);
+  const hair = (1.25 * u) / s;
 
-  const hair = 1.2 / s;
-  const ink = "rgba(21,21,21,0.5)";
-  const guide = "rgba(21,21,21,0.12)";
+  // One beam per band edge, coloured by its band; odd ones come the other way.
+  const beams = BANDS.flatMap((b, bi) => [b.a, b.b].map((c, j) => ({ c, fill: b.fill, i: bi * 2 + j })));
+  const beam = (i: number) => ease(frame, BEAMS + i * 16, BEAMS + i * 16 + 22, [0, 1], RISE);
+  const lock = (i: number) => interpolate(frame, [BEAMS + i * 16 + 18, BEAMS + i * 16 + 24, BEAMS + i * 16 + 60], [0, 1, 0], clamp);
+  const form = (i: number) => ease(frame, FORM + i * 22, FORM + i * 22 + 52, [0, 1], GLIDE);
+
+  const wordLeft = (width - lockW) / 2;
+  const wordTop = (height - finalMark) / 2;
 
   return (
     <AbsoluteFill style={{ backgroundColor: C.paper }}>
-      <Texture opacity={0.05} />
+      <svg width={markSize} height={markSize * (264 / 263)} viewBox="0 0 263 264" style={{ position: "absolute", left: markX, top: markY, overflow: "visible" }}>
+        <defs>
+          <clipPath id="lb-square">
+            <path d={SQUARE} />
+          </clipPath>
+          <filter id="lb-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation={4 / Math.max(s, 0.1)} />
+          </filter>
+        </defs>
 
-      {/* Fine background grid. */}
-      <AbsoluteFill
-        style={{
-          opacity: grid * construct * 0.9,
-          backgroundImage: `linear-gradient(${guide} 1px, transparent 1px), linear-gradient(90deg, ${guide} 1px, transparent 1px)`,
-          backgroundSize: `${(263 / 8) * k}px ${(263 / 8) * k}px`,
-          backgroundPosition: `${(width - big) / 2}px ${(height - big) / 2}px`,
-          maskImage: "radial-gradient(circle at center, #000 20%, transparent 62%)",
-          WebkitMaskImage: "radial-gradient(circle at center, #000 20%, transparent 62%)",
-        }}
-      />
+        {/* The square, hairline. */}
+        <rect x={0} y={0} width={263} height={264} fill="none" stroke="rgba(21,21,21,0.4)" strokeWidth={hair} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - square} opacity={1 - burn} />
 
-      <AbsoluteFill style={{ opacity: 1 - out, transform: `scale(${1 + out * 0.03})` }}>
-        <svg
-          width={markSize}
-          height={markSize * (264 / 263)}
-          viewBox="0 0 263 264"
-          style={{ position: "absolute", left: markX, top: markY, overflow: "visible", transform: `scale(${1 + (pop - 1) * 0.04})`, transformOrigin: "50% 50%" }}
-        >
-          <defs>
-            <linearGradient id="lb-sweep" gradientUnits="userSpaceOnUse" x1={0} y1={0} x2={263} y2={264}>
-              <stop offset={Math.max(0, sweep - 0.18)} stopColor="#fff" stopOpacity={0} />
-              <stop offset={Math.min(1, Math.max(0, sweep))} stopColor="#fff" stopOpacity={0.95} />
-              <stop offset={Math.min(1, sweep + 0.18)} stopColor="#fff" stopOpacity={0} />
-            </linearGradient>
-          </defs>
+        {/* Bands grow out from their centre line to the beams, inside the square. */}
+        <g clipPath="url(#lb-square)">
+          {BANDS.map((b, i) => {
+            const mid = (b.a + b.b) / 2;
+            const half = ((b.b - b.a) / 2) * form(i);
+            const a = mid - half;
+            const z = mid + half;
+            return (
+              <g key={b.fill} opacity={form(i) > 0 ? 1 : 0}>
+                <path d={`M${a + FAR},${-FAR} L${z + FAR},${-FAR} L${z - FAR},${FAR} L${a - FAR},${FAR} Z`} fill={b.fill} />
+              </g>
+            );
+          })}
+        </g>
+        {/* Then the mark's own outline takes over (it has the chamfers). */}
+        {BANDS.map((b, i) => (
+          <path key={`m-${b.fill}`} d={b.d} fill={b.fill} opacity={form(i) >= 1 ? 1 : 0} />
+        ))}
 
-          {/* Construction: the square and the 45deg lines. */}
-          <g opacity={construct}>
-            <rect x={0} y={0} width={263} height={264} fill="none" stroke={ink} strokeWidth={hair} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - lines(0)} />
-            {DIAGONALS.map((c, i) => {
-              const p = lines(i + 1);
-              // Line x + y = c, extended 40 units past the square each way.
-              const x1 = Math.min(263, c) + 40;
-              const y1 = c - Math.min(263, c) - 40;
-              const x2 = Math.max(0, c - 264) - 40;
-              const y2 = c - Math.max(0, c - 264) + 40;
-              return <line key={c} x1={x1} y1={y1} x2={x1 + (x2 - x1) * p} y2={y1 + (y2 - y1) * p} stroke={ink} strokeWidth={hair} strokeDasharray={`${12 / s} ${12 / s}`} />;
-            })}
-          </g>
+        {/* The beams: thin light on x + y = c, shooting in along the diagonal. */}
+        <g opacity={1 - burn}>
+          {beams.map(({ c, fill, i }) => {
+            const p = beam(i);
+            if (p <= 0) return null;
+            const from = i % 2 === 0 ? 1 : -1;
+            // Head runs from far off one end to far off the other.
+            const head = from * FAR * (1 - 2 * p);
+            const tail = from * FAR;
+            const x1 = c / 2 + tail;
+            const y1 = c / 2 - tail;
+            const x2 = c / 2 + head;
+            const y2 = c / 2 - head;
+            const glow = lock(i);
+            return (
+              <g key={c}>
+                <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={fill} strokeWidth={hair * (3 + glow * 6)} opacity={0.35 + glow * 0.4} filter="url(#lb-glow)" />
+                <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={fill} strokeWidth={hair * 1.6} />
+              </g>
+            );
+          })}
+        </g>
+      </svg>
 
-          {BANDS.map((b, i) => (
-            <g key={b.fill}>
-              <path d={b.d} fill={b.fill} opacity={flood(i)} />
-              <path d={b.d} fill="none" stroke={C.ink} strokeWidth={hair * 1.6} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - trace(i)} opacity={construct} />
-            </g>
-          ))}
-          {/* The light pass that fills the bands. */}
-          {sweep > -0.3 && sweep < 1.3
-            ? BANDS.map((b) => <path key={`s-${b.fill}`} d={b.d} fill="url(#lb-sweep)" style={{ mixBlendMode: "screen" }} />)
-            : null}
-        </svg>
+      {/* The wordmark, letter by letter, each rising from behind its baseline. */}
+      {LETTERS.map(([l, r], i) => {
+        const t = ease(frame, LETTERS_IN + i * 6, LETTERS_IN + i * 6 + 38, [0, 1], RISE);
+        return (
+          <div
+            key={l}
+            style={{
+              position: "absolute",
+              left: wordLeft,
+              top: wordTop,
+              width: lockW,
+              height: finalMark,
+              // Clipped at the baseline (the bottom of the lockup box) and the letter's own sides.
+              clipPath: `inset(-30% ${100 - r - 0.3}% 0% ${l - 0.3}%)`,
+            }}
+          >
+            <Img src={staticFile("logo/full-color.svg")} style={{ width: lockW, height: finalMark, transform: `translateY(${(1 - t) * 100}%)` }} />
+          </div>
+        );
+      })}
 
-        {/* Wordmark slides out from behind the mark. */}
-        <div
-          style={{
-            position: "absolute",
-            left: (width - lockW) / 2,
-            top: (height - finalMark) / 2,
-            width: lockW,
-            height: finalMark,
-            clipPath: `inset(-20% ${(1 - word) * 72}% -20% 28%)`,
-          }}
-        >
-          <Img src={staticFile("logo/full-color.svg")} style={{ width: lockW, height: finalMark, transform: `translateX(${-(1 - word) * 46 * (lockW / 264)}px)` }} />
-        </div>
-
-        <Glint
-          x={markX + markSize * 0.82}
-          y={markY + markSize * 0.12}
-          size={150 * u}
-          intensity={interpolate(frame, [236, 242, 290], [0, 1, 0], clamp)}
-          rotate={frame * 0.6}
-          color="#ffffff"
-        />
-      </AbsoluteFill>
     </AbsoluteFill>
   );
 };

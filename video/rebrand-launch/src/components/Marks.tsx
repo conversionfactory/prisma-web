@@ -61,20 +61,22 @@ type LockupProps = {
   word?: number;
   assemble?: number;
   fly?: number;
+  /** alternate treatment: wordmark from another logo/*.svg, mark in one colour if given */
+  mono?: { color?: string; src: string };
 };
 
 // The full-colour lockup (logo/full-color.svg, 264x67): the mark is drawn
 // inline so it can assemble, the wordmark is the SVG clipped past the mark.
-export const Lockup: React.FC<LockupProps> = ({ x, y, width, word = 1, assemble = 1, fly }) => {
+export const Lockup: React.FC<LockupProps> = ({ x, y, width, word = 1, assemble = 1, fly, mono }) => {
   const k = width / 264;
   const h = 67 * k;
   const split = (74 / 264) * 100;
   return (
     <div style={{ position: "absolute", left: x, top: y - h / 2, width, height: h }}>
-      <NewMark size={67 * k} assemble={assemble} fly={fly} style={{ position: "absolute", left: 0, top: 0 }} />
+      <NewMark size={67 * k} assemble={assemble} fly={fly} mono={mono?.color} style={{ position: "absolute", left: 0, top: 0 }} />
       {word > 0 ? (
         <div style={{ position: "absolute", inset: 0, clipPath: `inset(-20% ${(1 - word) * (100 - split)}% -20% ${split}%)` }}>
-          <Img src={staticFile("logo/full-color.svg")} style={{ width, height: h, transform: `translateX(${-(1 - word) * 46 * k}px)` }} />
+          <Img src={staticFile(mono?.src ?? "logo/full-color.svg")} style={{ width, height: h, transform: `translateX(${-(1 - word) * 46 * k}px)` }} />
         </div>
       ) : null}
     </div>

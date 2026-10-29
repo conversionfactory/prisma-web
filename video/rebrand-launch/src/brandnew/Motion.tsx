@@ -1,48 +1,8 @@
 import React from "react";
-import { AbsoluteFill, Img, Sequence, interpolate, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { Glint } from "../components/Glint";
-import { Lockup } from "../components/Marks";
-import { useLayout } from "../components/layout";
+import { AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { GLIDE, LEAVE, RISE, clamp, ease } from "../components/motion";
-import { Opener } from "../scenes/Opener";
-import { REVEAL_LOCKUP, Reveal } from "../scenes/Reveal";
-import { SpectralBottom, Texture, Wrapped } from "../site/Surfaces";
-import { BAR, C } from "../theme";
-
-// ---- Before -> after: the opener and reveal, ending on a held lockup. ----
-
-export const BEFORE_AFTER_FRAMES = BAR * 4 + 150;
-
-const Hold: React.FC = () => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const { cx, cy, u } = useLayout();
-  const out = ease(frame, 120, 150, [0, 1], LEAVE);
-  return (
-    <Wrapped u={u}>
-      <SpectralBottom u={u} t={(frame + BAR * 2) / fps} />
-      <Texture opacity={0.04} />
-      <div style={{ opacity: 1 - out }}>
-        <Lockup x={cx - (REVEAL_LOCKUP * u) / 2} y={cy} width={REVEAL_LOCKUP * u} />
-      </div>
-      <Glint x={cx - (REVEAL_LOCKUP * u) / 2 + 200 * u} y={cy - 90 * u} size={130 * u} intensity={interpolate(frame, [20, 26, 70], [0, 1, 0], clamp)} />
-    </Wrapped>
-  );
-};
-
-export const BeforeAfterFilm: React.FC = () => (
-  <AbsoluteFill style={{ backgroundColor: "#000" }}>
-    <Sequence durationInFrames={BAR * 2}>
-      <Opener />
-    </Sequence>
-    <Sequence from={BAR * 2} durationInFrames={BAR * 2}>
-      <Reveal />
-    </Sequence>
-    <Sequence from={BAR * 4} durationInFrames={150}>
-      <Hold />
-    </Sequence>
-  </AbsoluteFill>
-);
+import { Texture } from "../site/Surfaces";
+import { C, INTER } from "../theme";
 
 // ---- The mark as a window onto the brand's photography. ----
 // Each band of the mark is a window: the hazy landscapes from the site drift
@@ -106,65 +66,77 @@ export const MarkWindow: React.FC = () => {
   );
 };
 
-// ---- The live homepage, scrolled section by section in a browser window
-// floating over the CTA sky. Source: a 1440px-wide capture at 1.5x. ----
+// ---- The live homepage scrolling on a laptop on a desk (after Studio
+// Kiln's Reset mockup). The photo is a Flora render with a flat green screen;
+// the page is a 1440px-wide capture of the whole homepage, stitched viewport
+// by viewport, scrolled in one smooth glide under the site's floating header.
 
-const PAGE = { w: 2160, h: 8100 };
-const STOPS = [0, 2420, 4160, 5440, 6860];
-const MOVE = 54;
-const HOLD = 56;
-export const SITE_FRAMES = 40 + STOPS.length * HOLD + (STOPS.length - 1) * MOVE + 40;
+// The green screen in the 1920x1080 frame, grown 1.5px to cover its fringe.
+const SCREEN = { x: 647.25, y: 412.5, w: 661.5, h: 428.25 };
+const PAGE = { w: 1440, h: 11454 };
+const BAR = 30; // browser chrome, in page px
+
+// The scroll stops at two sections, and at each one the camera pushes into
+// the screen until the section fills the frame, holds, then pulls back:
+// "Ship a production TypeScript app in three steps" and "What changes when
+// your stack is built to work together" (offsets measured on the live page).
+const STOPS = [0, 2701, 6138];
+const SCROLLS = [
+  [50, 190],
+  [440, 600],
+  [850, 1030],
+];
+const ZOOMS = [
+  [196, 276, 360, 440],
+  [606, 686, 770, 850],
+];
+export const SITE_FRAMES = 1140;
 
 export const SiteScroll: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps, width, height } = useVideoConfig();
+  const { width, height } = useVideoConfig();
   const u = Math.min(width / 1920, height / 1080);
 
-  const winW = 1500 * u;
-  const bar = 44 * u;
-  const winH = 900 * u;
-  const k = winW / PAGE.w;
-
+  const k = SCREEN.w / PAGE.w;
+  const viewH = SCREEN.h / k - BAR;
+  const ends = [...STOPS.slice(1), PAGE.h - viewH];
   let y = STOPS[0];
-  for (let i = 1; i < STOPS.length; i++) {
-    const start = 40 + i * HOLD + (i - 1) * MOVE;
-    y += (STOPS[i] - STOPS[i - 1]) * ease(frame, start, start + MOVE, [0, 1], GLIDE);
-  }
-  const enter = ease(frame, 0, 50, [0, 1], RISE);
-  const out = ease(frame, SITE_FRAMES - 30, SITE_FRAMES, [0, 1], LEAVE);
-  const drift = interpolate(frame, [0, SITE_FRAMES], [1.06, 1], clamp);
+  SCROLLS.forEach(([a, b], i) => {
+    y += (ends[i] - (i === 0 ? STOPS[0] : ends[i - 1])) * ease(frame, a, b, [0, 1], GLIDE);
+  });
+  // The site swaps its full-width header for the floating pill once scrolled.
+  const pill = interpolate(y, [30, 140], [0, 1], clamp);
+
+  // Camera: push in so the screen fills the frame height, centred.
+  let z = 0;
+  for (const [a, b, c, d] of ZOOMS) z = Math.max(z, interpolate(frame, [a, b, c, d], [0, 1, 1, 0], { ...clamp, easing: GLIDE }));
+  const Z = 1 + (1000 / SCREEN.h - 1) * z;
+  const sc = { x: (SCREEN.x + SCREEN.w / 2) * u, y: (SCREEN.y + SCREEN.h / 2) * u };
+  const dx = (width / 2 - sc.x * Z) * z + (sc.x - sc.x * Z) * (1 - z);
+  const dy = (height / 2 - sc.y * Z) * z + (sc.y - sc.y * Z) * (1 - z);
 
   return (
-    <AbsoluteFill style={{ backgroundColor: C.paper }}>
-      <Img src={staticFile("brand/agent-loop.jpg")} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", transform: `scale(${drift})` }} />
-      <SpectralBottom u={u} t={frame / fps} strength={0.6} />
-      <AbsoluteFill style={{ opacity: 1 - out }}>
-        <div
-          style={{
-            position: "absolute",
-            left: (width - winW) / 2,
-            top: (height - winH) / 2 + 40 * u + (1 - enter) * 160 * u,
-            width: winW,
-            height: winH,
-            opacity: enter,
-            borderRadius: 22 * u,
-            overflow: "hidden",
-            background: C.white,
-            boxShadow: `0 ${60 * u}px ${120 * u}px -${40 * u}px rgba(30,40,60,0.45)`,
-            border: `${1.5 * u}px solid rgba(255,255,255,0.7)`,
-          }}
-        >
-          <div style={{ height: bar, display: "flex", alignItems: "center", gap: 9 * u, paddingLeft: 20 * u, borderBottom: `${1.5 * u}px solid ${C.border}`, background: "#fbfbf9" }}>
-            {[0, 1, 2].map((i) => (
-              <span key={i} style={{ width: 12 * u, height: 12 * u, borderRadius: 99, background: "rgba(21,21,21,0.12)" }} />
-            ))}
-            <div style={{ position: "absolute", left: winW / 2 - 120 * u, width: 240 * u, height: 26 * u, borderRadius: 99, background: "rgba(21,21,21,0.05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 * u, color: C.muted, fontFamily: "Inter, sans-serif" }}>
-              prisma.io
+    <AbsoluteFill style={{ backgroundColor: "#e9d6bd", overflow: "hidden" }}>
+      <AbsoluteFill style={{ transform: `translate(${dx}px, ${dy}px) scale(${Z})`, transformOrigin: "0 0" }}>
+        <Img src={staticFile("brandnew/laptop.jpg")} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
+        <div style={{ position: "absolute", left: SCREEN.x * u, top: SCREEN.y * u, width: SCREEN.w * u, height: SCREEN.h * u, overflow: "hidden", background: C.white }}>
+          <div style={{ width: PAGE.w, height: SCREEN.h / k, transform: `scale(${k * u})`, transformOrigin: "0 0" }}>
+            {/* Browser chrome. */}
+            <div style={{ position: "relative", height: BAR, display: "flex", alignItems: "center", gap: 7, paddingLeft: 14, background: "#f1f1ef", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
+              {["#ff5f57", "#febc2e", "#28c840"].map((c) => (
+                <span key={c} style={{ width: 11, height: 11, borderRadius: 99, background: c }} />
+              ))}
+              <span style={{ position: "absolute", left: PAGE.w / 2 - 130, width: 260, height: 20, borderRadius: 6, background: "rgba(0,0,0,0.05)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: INTER, fontSize: 12, color: C.muted }}>
+                prisma.io
+              </span>
+            </div>
+            <div style={{ position: "relative", height: viewH, overflow: "hidden" }}>
+              <Img src={staticFile("brandnew/home-scroll.png")} style={{ position: "absolute", left: 0, top: 0, width: PAGE.w, height: PAGE.h, transform: `translateY(${-y}px)` }} />
+              <Img src={staticFile("brandnew/header-pill.png")} style={{ position: "absolute", left: 0, top: 0, width: PAGE.w, height: 100, opacity: pill }} />
             </div>
           </div>
-          <div style={{ position: "relative", height: winH - bar, overflow: "hidden" }}>
-            <Img src={staticFile("brandnew/home-tall.png")} style={{ position: "absolute", left: 0, top: -y * k, width: winW, height: PAGE.h * k }} />
-          </div>
+          {/* A faint sheen across the glass. */}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(115deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0) 38%)" }} />
         </div>
       </AbsoluteFill>
     </AbsoluteFill>

@@ -352,6 +352,60 @@ const Stickers: React.FC = () => (
   </AbsoluteFill>
 );
 
+// Die-cut stickers: the white border follows each artwork's own outline
+// (alpha blurred, then thresholded, so the contour is smooth and rounded)
+// instead of sitting on a square or circle card.
+const DieCutDefs: React.FC = () => (
+  <svg width={0} height={0} style={{ position: "absolute" }}>
+    <defs>
+      {[18, 30, 44].map((r) => (
+        <filter key={r} id={`diecut-${r}`} x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation={r / 2} result="blur" />
+          <feComponentTransfer in="blur" result="cut">
+            <feFuncA type="linear" slope={40} intercept={-1.2} />
+          </feComponentTransfer>
+          <feFlood floodColor="#ffffff" />
+          <feComposite in2="cut" operator="in" result="paper" />
+          <feGaussianBlur in="cut" stdDeviation={10} result="soft" />
+          <feOffset in="soft" dy={10} result="drop" />
+          <feFlood floodColor="rgba(21,21,21,0.28)" />
+          <feComposite in2="drop" operator="in" result="shadow" />
+          <feMerge>
+            <feMergeNode in="shadow" />
+            <feMergeNode in="paper" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      ))}
+    </defs>
+  </svg>
+);
+
+const DieCut: React.FC<{ x: number; y: number; rotate: number; r?: 18 | 30 | 44; children: React.ReactNode }> = ({ x, y, rotate, r = 30, children }) => (
+  <div style={{ position: "absolute", left: x, top: y, transform: `translate(-50%, -50%) rotate(${rotate}deg)`, filter: `url(#diecut-${r})`, display: "flex" }}>{children}</div>
+);
+
+const StickersDieCut: React.FC = () => (
+  <AbsoluteFill style={{ backgroundColor: "#e9ebe6" }}>
+    <DieCutDefs />
+    <DieCut x={540} y={520} rotate={-8} r={30}>
+      <NewMark size={540} />
+    </DieCut>
+    <DieCut x={1440} y={500} rotate={6} r={18}>
+      <Img src={staticFile("mascot/salute.png")} style={{ width: 640, height: 640 }} />
+    </DieCut>
+    <DieCut x={1000} y={1060} rotate={-3} r={30}>
+      <Img src={staticFile("logo/full-color.svg")} style={{ width: 880, height: 880 * (67 / 264) }} />
+    </DieCut>
+    <DieCut x={540} y={1560} rotate={7} r={44}>
+      <Img src={staticFile("figma/prisma-print.svg")} style={{ width: 680, height: 680 }} />
+    </DieCut>
+    <DieCut x={1460} y={1540} rotate={-6} r={18}>
+      <Img src={staticFile("mascot/happy.png")} style={{ width: 560, height: 560 }} />
+    </DieCut>
+  </AbsoluteFill>
+);
+
 export const BrandNewStills: React.FC = () => (
   <>
     <Still id="BN01-before-after" component={BeforeAfter} width={W} height={H} />
@@ -375,5 +429,6 @@ export const BrandNewStills: React.FC = () => (
     <Still id="FL-billboard-ray" component={BillboardRay} width={3000} height={1000} />
     <Still id="FL-poster" component={Poster} width={1200} height={1800} />
     <Still id="FL-stickers" component={Stickers} width={2000} height={2000} />
+    <Still id="FL-stickers-diecut" component={StickersDieCut} width={2000} height={2000} />
   </>
 );
